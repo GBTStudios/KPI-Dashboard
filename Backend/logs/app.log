@@ -6,3 +6,5 @@
 2026-07-27 12:24:15,675 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
 2026-07-27 12:24:32,026 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
 2026-07-27 12:26:52,124 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
+2026-07-27 13:10:02,956 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-07-27 14:29:22,118 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
