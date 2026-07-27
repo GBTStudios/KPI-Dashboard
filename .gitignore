@@ -1,1 +1,6 @@
 .env
+
+# Node (Frontend)
+Frontend/node_modules/
+Frontend/dist/
+Frontend/.vite/
