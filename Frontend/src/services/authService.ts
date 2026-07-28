@@ -41,3 +41,24 @@ export async function login({ email, password }: LoginPayload) {
 
   return response.json();
 }
+
+interface ForgotPasswordPayload {
+  email: string;
+}
+
+export async function requestPasswordReset({ email }: ForgotPasswordPayload) {
+  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.detail || "Something went wrong. Please try again.",
+    );
+  }
+
+  return response.json();
+}
