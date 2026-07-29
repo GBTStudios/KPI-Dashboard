@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Lock, Eye, EyeOff } from "lucide-react";
 import logo from "../assets/logo.png";
 import "../styles/ResetPassword.css";
 
@@ -33,21 +34,30 @@ export default function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [confirmTouched, setConfirmTouched] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const strength = getStrength(password);
 
+  const passwordError =
+    passwordTouched && strength.level < 3
+      ? password.length === 0
+        ? "Password is required."
+        : "Choose a stronger password."
+      : "";
+
+  const confirmError =
+    confirmTouched && confirmPassword !== password ? "Passwords do not match." : "";
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
+    setSubmitError("");
+    setPasswordTouched(true);
+    setConfirmTouched(true);
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-    if (strength.level < 3) {
-      setError("Please choose a stronger password.");
+    if (strength.level < 3 || confirmPassword !== password) {
       return;
     }
 
@@ -56,7 +66,7 @@ export default function ResetPassword() {
       // TODO: call resetPassword service once backend endpoint exists
       navigate("/login");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -78,18 +88,19 @@ export default function ResetPassword() {
               unique to protect your organization's data.
             </p>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} autoComplete="off" noValidate>
               <div className="form-group">
                 <label htmlFor="password">New Password</label>
-                <div className="input-with-icon">
-                  <span className="input-icon">🔒</span>
+                <div className={`input-with-icon ${passwordError ? "input-error" : ""}`}>
+                  <Lock size={14} className="input-icon" />
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter new password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required
+                    onBlur={() => setPasswordTouched(true)}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
@@ -97,22 +108,24 @@ export default function ResetPassword() {
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label="Toggle password visibility"
                   >
-                    👁
+                    {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                   </button>
                 </div>
+                {passwordError && <span className="field-error">{passwordError}</span>}
               </div>
 
               <div className="form-group">
                 <label htmlFor="confirmPassword">Confirm Password</label>
-                <div className="input-with-icon">
-                  <span className="input-icon">🔒</span>
+                <div className={`input-with-icon ${confirmError ? "input-error" : ""}`}>
+                  <Lock size={14} className="input-icon" />
                   <input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
+                    onBlur={() => setConfirmTouched(true)}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
@@ -120,11 +133,13 @@ export default function ResetPassword() {
                     onClick={() => setShowConfirmPassword((v) => !v)}
                     aria-label="Toggle confirm password visibility"
                   >
-                    👁
+                    {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                   </button>
                 </div>
+                {confirmError && <span className="field-error">{confirmError}</span>}
               </div>
 
+              {password.length > 0 && (
               <div className="strength-box">
                 <div className="strength-header">
                   <span>Password strength</span>
@@ -155,8 +170,9 @@ export default function ResetPassword() {
                   })}
                 </div>
               </div>
+              )}
 
-              {error && <p className="form-error">{error}</p>}
+              {submitError && <p className="form-error">{submitError}</p>}
 
               <button type="submit" className="btn-primary" disabled={loading}>
                 {loading ? "Updating..." : "Update Password"}
