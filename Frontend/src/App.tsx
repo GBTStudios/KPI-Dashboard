@@ -6,7 +6,9 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import KpiEntry from "./pages/KpiEntry";
 import ImportData from "./pages/ImportData";
+import UserManagement from "./pages/UserManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "./components/Layout";
 import "./index.css";
 
 export default function App() {
@@ -17,32 +19,13 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/kpi-entry"
-          element={
-            <ProtectedRoute>
-              <KpiEntry />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/import-data"
-          element={
-            <ProtectedRoute>
-              <ImportData />
-            </ProtectedRoute>
-          }
-        />
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/kpi-entry" element={<KpiEntry />} />
+          <Route path="/import-data" element={<ImportData />} />
+          <Route path="/user-management" element={<UserManagement />} />
+        </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
