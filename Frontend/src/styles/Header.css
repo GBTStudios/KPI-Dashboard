@@ -73,3 +73,17 @@
   border-radius: 50%;
   object-fit: cover;
 }
+
+.header-avatar-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.header-avatar-button:hover .header-avatar {
+  outline: 2px solid #E1F0EE;
+}

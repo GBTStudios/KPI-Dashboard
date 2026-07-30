@@ -7,6 +7,7 @@ interface HeaderProps {
   hasNotifications?: boolean;
   userAvatar?: string;
   userName?: string;
+  onAvatarClick?: () => void;
 }
 
 export default function Header({
@@ -15,6 +16,7 @@ export default function Header({
   hasNotifications = false,
   userAvatar,
   userName = "User",
+  onAvatarClick,
 }: HeaderProps) {
   return (
     <header className="app-header">
@@ -33,11 +35,18 @@ export default function Header({
           {hasNotifications && <span className="notification-dot" />}
         </button>
 
-        <img
-          src={userAvatar || "/default-avatar.png"}
-          alt={userName}
-          className="header-avatar"
-        />
+        <button
+          type="button"
+          className="header-avatar-button"
+          onClick={onAvatarClick}
+          aria-label="Open profile"
+        >
+          <img
+            src={userAvatar || "/default-avatar.png"}
+            alt={userName}
+            className="header-avatar"
+          />
+        </button>
       </div>
     </header>
   );
