@@ -30,7 +30,12 @@ export default function Layout() {
       <div className="app-main">
         <Header onAvatarClick={() => setShowProfileModal(true)} />
         <div className="app-content">
-          <Outlet />
+          <Outlet
+            context={{
+              openProfileModal: () => setShowProfileModal(true),
+              openLogoutModal: () => setShowLogoutModal(true),
+            }}
+          />
         </div>
         <Footer />
       </div>

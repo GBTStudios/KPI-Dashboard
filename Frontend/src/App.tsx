@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import KpiEntry from "./pages/KpiEntry";
 import ImportData from "./pages/ImportData";
 import UserManagement from "./pages/UserManagement";
+import Settings from "./pages/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import "./index.css";
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/kpi-entry" element={<KpiEntry />} />
           <Route path="/import-data" element={<ImportData />} />
           <Route path="/user-management" element={<UserManagement />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
