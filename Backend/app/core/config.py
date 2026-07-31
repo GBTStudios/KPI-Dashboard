@@ -26,6 +26,15 @@ class Settings(BaseSettings):
 
     GOOGLE_CLIENT_ID: str = ""
 
+    # ---- SendGrid (transactional email: verification + password reset) ----
+    SENDGRID_API_KEY: str = ""
+    SENDGRID_FROM_EMAIL: str = "no-reply@groundbreakerstudio.com"
+    SENDGRID_FROM_NAME: str = "GroundPulse"
+
+    # ---- Email verification ----
+    EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
+    FRONTEND_VERIFY_EMAIL_URL: str = "http://localhost:3000/verify-email"
+
     CORS_ORIGINS: str = "*"
     TRUSTED_HOSTS: str = "*"
 

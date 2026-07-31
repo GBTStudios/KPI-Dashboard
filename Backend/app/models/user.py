@@ -33,9 +33,6 @@ class User(Base):
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
-    # --- Terms of Service (required checkbox on the Signup screen) ---
-    accepted_terms: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    accepted_terms_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # --- Google Sign-In ---
     oauth_provider: Mapped[str | None] = mapped_column(String(50), nullable=True)  # e.g. "google"

@@ -18,9 +18,7 @@ class SignupRequest(BaseModel):
     email: EmailStr
     password: str
     confirm_password: str
-    accepted_terms: bool = Field(
-        description="Must be true - corresponds to the 'I agree to the Terms of Service and Privacy Policy' checkbox."
-    )
+
 
     @field_validator("confirm_password")
     @classmethod
@@ -29,13 +27,14 @@ class SignupRequest(BaseModel):
             raise ValueError("PASSWORDS_DO_NOT_MATCH")
         return v
 
-    @field_validator("accepted_terms")
-    @classmethod
-    def terms_must_be_accepted(cls, v: bool) -> bool:
-        if v is not True:
-            raise ValueError("TERMS_NOT_ACCEPTED")
-        return v
+    
 
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+
+class ResendVerificationRequest(BaseModel):
+    email: EmailStr
 
 class LoginRequest(BaseModel):
     email: EmailStr

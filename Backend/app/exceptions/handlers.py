@@ -39,12 +39,13 @@ def register_exception_handlers(app):
         # generic message.
         for err in exc.errors():
             msg = str(err.get("ctx", {}).get("error", "")) or err.get("msg", "")
-            for code in ("PASSWORDS_DO_NOT_MATCH", "TERMS_NOT_ACCEPTED"):
-                if code in msg:
-                    return _error(
-                        "Passwords do not match." if code == "PASSWORDS_DO_NOT_MATCH" else "You must accept the Terms of Service and Privacy Policy.",
-                        code,
-                        status.HTTP_422_UNPROCESSABLE_ENTITY,
+            if "PASSWORDS_DO_NOT_MATCH" in msg:
+                return _error(
+                    "Passwords do not match.",
+                    "PASSWORDS_DO_NOT_MATCH",
+                    status.HTTP_422_UNPROCESSABLE_ENTITY,
+
+
                     )
         return _error("Validation failed.", "VALIDATION_FAILED", status.HTTP_422_UNPROCESSABLE_ENTITY, details=exc.errors())
 

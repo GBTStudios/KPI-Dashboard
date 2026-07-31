@@ -6,6 +6,7 @@ explicitly normalized to timezone-aware values before comparison, since
 SQLite (used in tests) does not preserve tzinfo the way Postgres does.
 """
 import logging
+import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -25,19 +26,23 @@ from app.exceptions.custom_exceptions import (
     AccountInactiveException,
     AccountLockedException,
     EmailAlreadyExistsException,
+    EmailVerificationTokenInvalidException,
     InvalidCredentialsException,
     PasswordResetTokenInvalidException,
     TokenRevokedException,
     UnauthorizedException,
 )
+from app.models.email_verification_token import EmailVerificationToken
 from app.models.password_reset_token import PasswordResetToken
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
 from app.repositories.audit_log_repository import AuditLogRepository
+from app.repositories.email_verification_repository import EmailVerificationRepository
 from app.repositories.password_reset_repository import PasswordResetRepository
 from app.repositories.refresh_token_repository import RefreshTokenRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.auth import TokenPair
+from app.services import email_service
 from app.services.google_oauth import verify_google_id_token
 
 logger = logging.getLogger("groundpulse")
@@ -59,6 +64,7 @@ class AuthService:
         self.refresh_tokens = RefreshTokenRepository(db)
         self.audit = AuditLogRepository(db)
         self.password_resets = PasswordResetRepository(db)
+        self.email_verifications = EmailVerificationRepository(db)
         self.ip_address = ip_address
         self.user_agent = user_agent
 
@@ -68,6 +74,7 @@ class AuthService:
     async def signup(self, full_name: str, email: str, password: str, accepted_terms: bool) -> User:
         email = email.lower().strip()
         logger.info("Signup attempt email=%s", email)
+
 
         existing = await self.users.get_by_email(email)
         if existing is not None:
@@ -82,10 +89,10 @@ class AuthService:
             full_name=full_name.strip(),
             email=email,
             password_hash=hash_password(password),
-            accepted_terms=True,
+            accepted_terms=accepted_terms,
             accepted_terms_at=datetime.now(timezone.utc),
             is_active=True,
-            is_verified=False,  # email verification not yet wired to SMTP; see docstring below
+            is_verified=False,
         )
         self.users.add(user)
         await self.users.flush()
@@ -93,6 +100,10 @@ class AuthService:
         self.audit.add("SIGNUP", user_id=user.id, description="Account created",
                         ip_address=self.ip_address, user_agent=self.user_agent)
         logger.info("Signup success user_id=%s email=%s", user.id, email)
+
+        # Best-effort: never let an email provider hiccup break signup itself.
+        await self._issue_and_send_verification_email(user)
+
         return user
 
     # ------------------------------------------------------------------
@@ -105,8 +116,6 @@ class AuthService:
         user = await self.users.get_by_email(email)
 
         if user is None or user.password_hash is None:
-            # Constant work done regardless of whether the user exists, so the
-            # response-time difference doesn't leak which emails are registered.
             hash_password(password)
             self.audit.add("LOGIN_FAILED", description=f"Unknown email {email}",
                             ip_address=self.ip_address, user_agent=self.user_agent)
@@ -128,7 +137,6 @@ class AuthService:
                             ip_address=self.ip_address, user_agent=self.user_agent)
             raise AccountInactiveException()
 
-        # Successful login resets lockout counters.
         user.failed_login_attempts = 0
         user.locked_until = None
         user.last_login = datetime.now(timezone.utc)
@@ -156,19 +164,6 @@ class AuthService:
     # GOOGLE SIGN-IN / SIGN-UP  ("Continue with Google" / "Sign up with Google")
     # ------------------------------------------------------------------
     async def google_auth(self, raw_id_token: str, remember_me: bool) -> tuple[User, TokenPair, bool]:
-        """Verifies the Google ID token, then either:
-          - logs into an existing Google-linked account, or
-          - auto-links Google to an existing email/password account with the
-            same (Google-verified) email, or
-          - creates a brand new account.
-
-        Returns (user, tokens, is_new_account). Auto-linking by verified email
-        is a deliberate product choice here (single account per email, matches
-        "Sign up with Google" and "Continue with Google" being the *same*
-        button/flow on both screens) - if you'd rather require an explicit
-        "link this account" confirmation step instead, raise
-        GoogleAccountConflictException in the branch below instead of linking.
-        """
         profile = verify_google_id_token(raw_id_token)
 
         user = await self.users.get_by_oauth("google", profile.sub)
@@ -177,7 +172,6 @@ class AuthService:
         if user is None:
             user = await self.users.get_by_email(profile.email)
             if user is not None:
-                # Link Google to the existing account.
                 user.oauth_provider = "google"
                 user.oauth_id = profile.sub
                 user.avatar_url = user.avatar_url or profile.avatar_url
@@ -196,8 +190,7 @@ class AuthService:
                     avatar_url=profile.avatar_url,
                     is_active=True,
                     is_verified=profile.email_verified,
-                    accepted_terms=True,  # Google button lives right below the ToS checkbox on Signup
-                    accepted_terms_at=datetime.now(timezone.utc),
+                    
                 )
                 self.users.add(user)
                 await self.users.flush()
@@ -248,8 +241,6 @@ class AuthService:
             raise TokenRevokedException()
 
         if stored.revoked or _aware(stored.expires_at) <= datetime.now(timezone.utc):
-            # Reuse of an already-rotated/revoked token: treat as a possible
-            # replay attack and revoke the whole chain for this user.
             await self.refresh_tokens.revoke_all_for_user(stored.user_id)
             logger.warning("Refresh token reuse detected user_id=%s - revoking all sessions", stored.user_id)
             raise TokenRevokedException()
@@ -289,23 +280,75 @@ class AuthService:
         logger.info("Logout user_id=%s", user_id or (stored.user_id if stored else "unknown"))
 
     # ------------------------------------------------------------------
+    # EMAIL VERIFICATION
+    # ------------------------------------------------------------------
+    async def _issue_and_send_verification_email(self, user: User) -> None:
+        """Creates a verification token and attempts delivery via SendGrid.
+        Never raises - a broken/unconfigured email provider must not break
+        the signup response."""
+        raw_token = secrets.token_urlsafe(32)
+        token_row = EmailVerificationToken(
+            user_id=user.id,
+            token_hash=hash_token(raw_token),
+            expires_at=datetime.now(timezone.utc)
+            + timedelta(minutes=settings.EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES),
+        )
+        self.email_verifications.add(token_row)
+        await self.db.flush()
+
+        verification_link = f"{settings.FRONTEND_VERIFY_EMAIL_URL}?token={raw_token}"
+        sent = email_service.send_verification_email(user.email, user.full_name, verification_link)
+
+        self.audit.add(
+            "EMAIL_VERIFICATION_SENT" if sent else "EMAIL_VERIFICATION_SEND_FAILED",
+            user_id=user.id,
+            description="Verification email dispatched" if sent else "Verification email delivery failed",
+            ip_address=self.ip_address, user_agent=self.user_agent,
+        )
+        logger.info("Verification email %s user_id=%s", "sent" if sent else "NOT sent", user.id)
+
+    async def verify_email(self, raw_token: str) -> User:
+        token_hash = hash_token(raw_token)
+        stored = await self.email_verifications.get_by_hash(token_hash)
+
+        if stored is None or stored.used or _aware(stored.expires_at) <= datetime.now(timezone.utc):
+            raise EmailVerificationTokenInvalidException()
+
+        user = await self.users.get_by_id(stored.user_id)
+        if user is None:
+            raise EmailVerificationTokenInvalidException()
+
+        user.is_verified = True
+        stored.used = True
+        stored.used_at = datetime.now(timezone.utc)
+
+        self.audit.add("EMAIL_VERIFIED", user_id=user.id, description="Email address verified",
+                        ip_address=self.ip_address, user_agent=self.user_agent)
+        logger.info("Email verified user_id=%s", user.id)
+        return user
+
+    async def resend_verification_email(self, email: str) -> None:
+        """Best-effort, no account-existence leak: silently no-ops for an
+        unknown email, an already-verified account, or a Google-only account."""
+        email = email.lower().strip()
+        user = await self.users.get_by_email(email)
+
+        if user is None or user.is_verified:
+            logger.info("Resend-verification no-op for email=%s (unknown or already verified)", email)
+            return
+
+        await self._issue_and_send_verification_email(user)
+
+    # ------------------------------------------------------------------
     # FORGOT PASSWORD / RESET PASSWORD
     # ------------------------------------------------------------------
     async def request_password_reset(self, email: str) -> str | None:
-        """Returns the raw reset token so the caller (route) can email it -
-        or None if the email isn't registered. The route/response never
-        reveals which case happened (always returns a generic "if this email
-        exists..." message) to avoid leaking which emails are registered.
-        """
         email = email.lower().strip()
         user = await self.users.get_by_email(email)
         if user is None or user.password_hash is None:
-            # Also applies to Google-only accounts, which have no local
-            # password to reset.
             logger.info("Password reset requested for non-resettable/unknown email=%s", email)
             return None
 
-        import secrets
         raw_token = secrets.token_urlsafe(32)
         reset_row = PasswordResetToken(
             user_id=user.id,
@@ -315,9 +358,15 @@ class AuthService:
         self.password_resets.add(reset_row)
         await self.db.flush()
 
-        self.audit.add("PASSWORD_RESET_REQUESTED", user_id=user.id, description="Reset token issued",
-                        ip_address=self.ip_address, user_agent=self.user_agent)
-        logger.info("Password reset token issued user_id=%s", user.id)
+        reset_link = f"{settings.FRONTEND_RESET_PASSWORD_URL}?token={raw_token}"
+        sent = email_service.send_password_reset_email(user.email, user.full_name, reset_link)
+
+        self.audit.add(
+            "PASSWORD_RESET_REQUESTED" if sent else "PASSWORD_RESET_SEND_FAILED",
+            user_id=user.id, description="Reset token issued",
+            ip_address=self.ip_address, user_agent=self.user_agent,
+        )
+        logger.info("Password reset token issued user_id=%s email_sent=%s", user.id, sent)
         return raw_token
 
     async def reset_password(self, raw_token: str, new_password: str) -> None:
@@ -338,7 +387,6 @@ class AuthService:
         stored.used = True
         stored.used_at = datetime.now(timezone.utc)
 
-        # Reset password -> invalidate all existing sessions for safety.
         await self.refresh_tokens.revoke_all_for_user(user.id)
 
         self.audit.add("PASSWORD_RESET_COMPLETED", user_id=user.id, description="Password reset",
