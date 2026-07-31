@@ -1,34 +1,44 @@
 import { useMemo, useState } from "react";
-import { Save, Send, Search, ChevronDown, Check } from "lucide-react";
+import { Save, Send, Search, ChevronDown, Check, Plus, X } from "lucide-react";
 import { mockKpiIndicators } from "../data/mockKpiData";
 import { MONTHS, getEndOfYearActual } from "../types/kpi";
 import type { KpiIndicator } from "../types/kpi";
 import "../styles/KpiEntry.css";
 
-const DEPARTMENTS = ["All departments", "Programs", "Marketing", "Funding"];
-const PARAMETERS = ["All parameters", "Campus", "Digital", "Grants"];
+const DEPARTMENTS = ["Programs", "Partnerships", "Marketing", "Funding", "M & E", "Mentorship", "Guestspeakers"];
+const PARAMETERS = ["Campus", "Recruitment", "Talent Retention", "Job Placement", "Visibility", "Invite Only Donors", "Sponsorships", "Grants", "Website", "Social Media", "Newsletter", "PR", "Surveys", "Mentors", "Guestspeakers"];
 const PEOPLE = ["Amara Whitfield", "John Doe", "Mary Precious"];
 const YEARS = ["2024", "2025", "2026"];
 
+interface NewRowForm {
+  department: string;
+  parameter: string;
+  personInCharge: string;
+  indicator: string;
+  annualTarget: string;
+}
+
+const emptyNewRow: NewRowForm = {
+  department: DEPARTMENTS[0],
+  parameter: PARAMETERS[0],
+  personInCharge: PEOPLE[0],
+  indicator: "",
+  annualTarget: "",
+};
+
 export default function KpiEntry() {
   const [mode, setMode] = useState<"create" | "update">("create");
-  const [department, setDepartment] = useState("All departments");
-  const [parameter, setParameter] = useState("All parameters");
-  const [person, setPerson] = useState(PEOPLE[0]);
   const [year, setYear] = useState("2026");
   const [search, setSearch] = useState("");
   const [indicators, setIndicators] = useState<KpiIndicator[]>(mockKpiIndicators);
   const [modifiedIds, setModifiedIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
+  const [newRow, setNewRow] = useState<NewRowForm>(emptyNewRow);
 
   const filtered = useMemo(() => {
-    return indicators.filter((row) => {
-      if (department !== "All departments" && row.department !== department) return false;
-      if (parameter !== "All parameters" && row.parameter !== parameter) return false;
-      if (search && !row.indicator.toLowerCase().includes(search.toLowerCase())) return false;
-      return true;
-    });
-  }, [indicators, department, parameter, search]);
+    if (!search) return indicators;
+    return indicators.filter((row) => row.indicator.toLowerCase().includes(search.toLowerCase()));
+  }, [indicators, search]);
 
   function handleActualChange(id: string, monthIndex: number, value: string) {
     const numValue = value === "" ? null : Number(value);
@@ -51,10 +61,36 @@ export default function KpiEntry() {
     setModifiedIds((prev) => new Set(prev).add(id));
   }
 
+  function handleAddIndicator() {
+    if (!newRow.indicator || !newRow.annualTarget) return;
+
+    const target = Number(newRow.annualTarget);
+    const monthlyTarget = Array(12).fill(Math.round(target / 12));
+
+    const newIndicator: KpiIndicator = {
+      id: crypto.randomUUID(),
+      department: newRow.department,
+      parameter: newRow.parameter,
+      personInCharge: newRow.personInCharge,
+      indicator: newRow.indicator,
+      annualTarget: target,
+      monthlyTarget,
+      monthlyActual: Array(12).fill(null),
+    };
+
+    setIndicators((prev) => [...prev, newIndicator]);
+    setNewRow((prev) => ({ ...prev, indicator: "", annualTarget: "" }));
+  }
+
+  function handleCancelNewRow() {
+    setNewRow(emptyNewRow);
+  }
+
   async function handleSave(type: "draft" | "submit") {
     setSaving(true);
     try {
-      // TODO: call KPI entry save/submit service once backend endpoint exists
+      // TODO: replace with real API call once backend endpoint exists.
+      console.log(`Saving as ${type}`);
       await new Promise((r) => setTimeout(r, 500));
       setModifiedIds(new Set());
     } finally {
@@ -85,7 +121,7 @@ export default function KpiEntry() {
         <div className="kpi-filter-group">
           <label>Department</label>
           <div className="kpi-select-wrap">
-            <select value={department} onChange={(e) => setDepartment(e.target.value)}>
+            <select value={newRow.department} onChange={(e) => setNewRow((r) => ({ ...r, department: e.target.value }))}>
               {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
             </select>
             <ChevronDown size={14} className="kpi-select-icon" />
@@ -95,7 +131,7 @@ export default function KpiEntry() {
         <div className="kpi-filter-group">
           <label>Parameter</label>
           <div className="kpi-select-wrap">
-            <select value={parameter} onChange={(e) => setParameter(e.target.value)}>
+            <select value={newRow.parameter} onChange={(e) => setNewRow((r) => ({ ...r, parameter: e.target.value }))}>
               {PARAMETERS.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
             <ChevronDown size={14} className="kpi-select-icon" />
@@ -105,7 +141,7 @@ export default function KpiEntry() {
         <div className="kpi-filter-group">
           <label>Person responsible</label>
           <div className="kpi-select-wrap">
-            <select value={person} onChange={(e) => setPerson(e.target.value)}>
+            <select value={newRow.personInCharge} onChange={(e) => setNewRow((r) => ({ ...r, personInCharge: e.target.value }))}>
               {PEOPLE.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
             <ChevronDown size={14} className="kpi-select-icon" />
@@ -122,11 +158,23 @@ export default function KpiEntry() {
           </div>
         </div>
 
-        <button type="button" className="kpi-btn-outline" onClick={() => handleSave("draft")} disabled={saving}>
-          <Save size={14} /> Save draft
+        <div className="kpi-filter-group">
+          <label>Indicator name</label>
+          <input
+            type="text"
+            className="kpi-plain-input"
+            placeholder="e.g. Electricity uptime days/month"
+            value={newRow.indicator}
+            onChange={(e) => setNewRow((r) => ({ ...r, indicator: e.target.value }))}
+          />
+        </div>
+
+      
+        <button type="button" className="kpi-btn-outline" onClick={handleCancelNewRow}>
+          <X size={14} /> Cancel
         </button>
-        <button type="button" className="kpi-btn-primary" onClick={() => handleSave("submit")} disabled={saving}>
-          <Send size={14} /> Submit KPI
+        <button type="button" className="kpi-btn-primary" onClick={handleAddIndicator}>
+          <Plus size={14} /> Add
         </button>
       </div>
 
@@ -158,6 +206,7 @@ export default function KpiEntry() {
             <col className="kpi-colw-dept" />
             <col className="kpi-colw-param" />
             <col className="kpi-colw-indicator" />
+            <col className="kpi-colw-person" />
             <col className="kpi-colw-target" />
             <col className="kpi-colw-map" />
             {MONTHS.map((m) => <col key={m} className="kpi-colw-month" />)}
@@ -168,6 +217,7 @@ export default function KpiEntry() {
               <th className="kpi-col-dept kpi-sticky">Department</th>
               <th className="kpi-col-param kpi-sticky">Parameter</th>
               <th className="kpi-col-indicator kpi-sticky">Indicator</th>
+              <th className="kpi-col-person kpi-sticky">Person Responsible</th>
               <th className="kpi-col-target kpi-sticky">Annual Target</th>
               <th className="kpi-col-map kpi-sticky">MAP</th>
               {MONTHS.map((m) => <th key={m} className="kpi-col-month">{m}</th>)}
@@ -187,11 +237,11 @@ export default function KpiEntry() {
                 <>
                   <tr key={`${row.id}-actuals`} className={isModified ? "kpi-row-modified" : ""}>
                     <td className="kpi-col-dept kpi-sticky" rowSpan={3}>
-                      <span className="kpi-dept-dot" />
                       {row.department}
                     </td>
                     <td className="kpi-col-param kpi-sticky" rowSpan={3}>{row.parameter}</td>
                     <td className="kpi-col-indicator kpi-sticky" rowSpan={3}>{row.indicator}</td>
+                    <td className="kpi-col-person kpi-sticky" rowSpan={3}>{row.personInCharge}</td>
                     <td className="kpi-col-target kpi-sticky kpi-target-cell" rowSpan={3}>
                       <input
                         type="number"
@@ -243,8 +293,8 @@ export default function KpiEntry() {
             })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6 + MONTHS.length} className="kpi-empty">
-                  No indicators match your filters.
+                <td colSpan={7 + MONTHS.length} className="kpi-empty">
+                  No indicators match your search.
                 </td>
               </tr>
             )}

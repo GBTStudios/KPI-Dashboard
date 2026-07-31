@@ -3,6 +3,7 @@ export interface KpiIndicator {
   department: string;
   parameter: string;
   indicator: string;
+  personInCharge: string;
   annualTarget: number;
   monthlyTarget: number[]; // 12 values, Jan–Dec
   monthlyActual: (number | null)[]; // 12 values, Jan–Dec

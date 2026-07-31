@@ -47,8 +47,8 @@
 }
 
 .kpi-entry-mode-switch button.active {
-  background: #0F172A;
-  border-color: #0F172A;
+  background: #14534E;
+  border-color: #14534E;
   color: #fff;
 }
 
@@ -208,6 +208,7 @@
 .kpi-colw-dept { width: 130px; }
 .kpi-colw-param { width: 110px; }
 .kpi-colw-indicator { width: 220px; }
+.kpi-colw-person { width: 140px; }
 .kpi-colw-target { width: 120px; }
 .kpi-colw-map { width: 90px; }
 .kpi-colw-month { width: 70px; }
@@ -248,6 +249,12 @@
   vertical-align: middle;
 }
 
+.kpi-col-person {
+  font-size: 12px;
+  color: #334155;
+  white-space: nowrap;
+}
+
 .kpi-col-dept { font-weight: 600; white-space: nowrap; }
 .kpi-col-target { text-align: right; }
 .kpi-col-map { font-size: 10.5px; font-weight: 700; white-space: nowrap; }
@@ -272,6 +279,7 @@
 .kpi-col-dept.kpi-sticky { left: 0; }
 .kpi-col-param.kpi-sticky { left: 130px; }
 .kpi-col-indicator.kpi-sticky { left: 240px; }
+.kpi-col-person.kpi-sticky { left: 460px; }
 .kpi-col-target.kpi-sticky { left: 460px; box-shadow: 2px 0 0 #E2E8F0; }
 .kpi-col-map.kpi-sticky { left: 580px; box-shadow: 2px 0 0 #E2E8F0; }
 
@@ -312,6 +320,25 @@ thead .kpi-sticky {
   outline: none;
   border-color: #4F46E5;
   background: #fff;
+}
+
+.kpi-plain-input {
+  border: 1px solid #E2E8F0;
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  font-family: 'Poppins', sans-serif;
+  color: #0F172A;
+  width: 100%;
+}
+
+.kpi-plain-input:focus {
+  outline: none;
+  border-color: #4F46E5;
+}
+
+.kpi-filter-narrow {
+  min-width: 110px;
 }
 
 .kpi-target-cell {
@@ -417,4 +444,51 @@ thead .kpi-sticky {
   .kpi-filter-group {
     min-width: 0;
   }
+}
+
+.kpi-btn-add-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px dashed #4F46E5;
+  color: #4F46E5;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.kpi-btn-add-row:hover {
+  background: #F8F9FA;
+}
+
+.kpi-add-row-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.kpi-add-row-form input {
+  border: 1px solid #E2E8F0;
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  font-family: 'Poppins', sans-serif;
+  color: #0F172A;
+  min-width: 130px;
+}
+
+.kpi-add-row-form input:focus {
+  outline: none;
+  border-color: #4F46E5;
 }
