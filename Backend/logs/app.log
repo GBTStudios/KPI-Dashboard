@@ -1,0 +1,10 @@
+2026-07-27 12:20:59,894 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-07-27 12:22:24,595 | WARNING | req_id=312d6fd1-69a0-4846-bd3e-051f595d6625 user_id=- | groundpulse | GET / -> 404 (1.64ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-27 12:22:24,841 | WARNING | req_id=dbc68c94-5a84-4dc1-ac44-651aba82d519 user_id=- | groundpulse | GET /favicon.ico -> 404 (0.75ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-27 12:23:07,605 | WARNING | req_id=72253adb-59c1-4faf-b35e-b605c1e070a6 user_id=- | groundpulse | GET /health -> 404 (0.61ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-27 12:23:31,647 | WARNING | req_id=764029d9-b0ab-484a-94e0-55c81f4fcad5 user_id=- | groundpulse | GET / -> 404 (1.84ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-27 12:24:15,675 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
+2026-07-27 12:24:32,026 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-07-27 12:26:52,124 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
+2026-07-27 13:10:02,956 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-07-27 14:29:22,118 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
