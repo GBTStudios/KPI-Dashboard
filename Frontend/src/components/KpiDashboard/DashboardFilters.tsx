@@ -1,12 +1,3 @@
-// Renders the "Comparing [May] vs [June]  Department [All]" bar.
-//
-// NEW CONCEPT: useState. This component needs to remember
-// which options the user picked — that's "state". Every time
-// state changes, React automatically re-renders this component
-// with the new values. No backend wiring yet, per your spec —
-// selections just live in memory for now.
-
-
 import { useState } from 'react';
 import type { FilterOptions } from '../../types/dashboard';
 
@@ -15,9 +6,6 @@ interface DashboardFiltersProps {
 }
 
 export default function DashboardFilters({ options }: DashboardFiltersProps) {
-  // useState<string>('May') means: "this piece of state is a string,
-  // and it starts out as 'May'". `monthA` is the current value,
-  // `setMonthA` is the function we call to change it.
   const [monthA, setMonthA] = useState<string>('May');
   const [monthB, setMonthB] = useState<string>('June');
   const [department, setDepartment] = useState<string>('All');
@@ -29,8 +17,6 @@ export default function DashboardFilters({ options }: DashboardFiltersProps) {
         <select
           className="filter-select"
           value={monthA}
-          // e.target.value is always a string in HTML, so no extra
-          // conversion is needed here — it matches our string state.
           onChange={(e) => setMonthA(e.target.value)}
         >
           {options.months.map((month) => (

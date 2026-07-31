@@ -23,12 +23,11 @@ const statusClassMap: Record<KpiStatus, string> = {
 function countCriticalAlerts(rows: KpiTableRow[]): number {
   return rows.filter((row) => row.status === 'Below Target').length;
 }
-
 export default function KpiTable({ rows }: KpiTableProps) {
   const criticalCount = countCriticalAlerts(rows);
 
   return (
-    <div className="kpi-table-card">
+    <>
       <div className="kpi-table-header">
         <div>
           <div className="kpi-table-title">KPIs requiring attention</div>
@@ -41,46 +40,49 @@ export default function KpiTable({ rows }: KpiTableProps) {
         )}
       </div>
 
-      <table className="kpi-table">
-        <thead>
-          <tr>
-            <th>Indicator</th>
-            <th>Department</th>
-            <th>May</th>
-            <th>Jun</th>
-            <th>Change</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => {
-            const isPositive = row.change >= 0;
-            return (
-              <tr key={row.indicator}>
-                <td className="kpi-indicator-cell">{row.indicator}</td>
-                <td>{row.department}</td>
-                <td>{row.may}%</td>
-                <td>{row.june}%</td>
-                <td>
-                  <span
-                    className={`kpi-change-cell ${
-                      isPositive ? 'kpi-change-up' : 'kpi-change-down'
-                    }`}
-                  >
-                    {isPositive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-                    {Math.abs(row.change)}
-                  </span>
-                </td>
-                <td>
-                  <span className={`status-badge ${statusClassMap[row.status]}`}>
-                    {row.status}
-                  </span>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+      <div className="kpi-table-wrapper">
+        <table className="kpi-table">
+          <thead>
+            <tr>
+              <th>Indicator</th>
+              <th>Department</th>
+              <th>May</th>
+              <th>Jun</th>
+              <th>Change</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => {
+              const isPositive = row.change >= 0;
+              const absChange = Math.abs(row.change);
+              return (
+                <tr key={row.indicator}>
+                  <td className="kpi-indicator-cell">{row.indicator}</td>
+                  <td>{row.department}</td>
+                  <td>{row.may}%</td>
+                  <td>{row.june}%</td>
+                  <td>
+                    <span
+                      className={`kpi-change-cell ${
+                        isPositive ? 'kpi-change-up' : 'kpi-change-down'
+                      }`}
+                    >
+                      {isPositive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+                      {absChange}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`status-badge ${statusClassMap[row.status]}`}>
+                      {row.status}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }

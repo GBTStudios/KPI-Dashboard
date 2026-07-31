@@ -30,11 +30,13 @@ export default function Dashboard() {
         <DepartmentPerformance data={departmentPerformance} />
       </div>
 
-      {/* 3. Filters */}
-      <DashboardFilters options={filterOptions} />
-
-      {/* 4. KPI Table */}
-      <KpiTable rows={kpiTableData} />
+          <div className="kpi-table-card">
+        {/* Filters inside the table card */}
+        <DashboardFilters options={filterOptions} />
+        
+        {/* Table */}
+        <KpiTable rows={kpiTableData} />
+      </div>
 
       {/* 5. Bottom Section */}
       <div className="bottom-section">

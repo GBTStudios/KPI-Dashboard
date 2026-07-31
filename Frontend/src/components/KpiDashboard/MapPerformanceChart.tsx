@@ -55,7 +55,7 @@ export default function MapPerformanceChart({ data }: MapPerformanceChartProps) 
           <Tooltip />
           <Legend
             verticalAlign="bottom"
-            align="left"
+            align="center"
             iconType="circle"
             formatter={(value) => (value === 'actual' ? 'Actual MAP' : 'Target MAP')}
           />
