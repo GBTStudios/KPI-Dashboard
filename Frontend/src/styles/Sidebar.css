@@ -1,0 +1,156 @@
+.sidebar {
+  width: 196px;
+  min-width: 196px;
+  height: calc(100vh - 24px);
+  background: #14534E;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 10px;
+  position: sticky;
+  top: 12px;
+  margin: 12px 0 12px 12px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(20, 83, 78, 0.18);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 18px;
+}
+
+.sidebar-logo {
+  width: 22px;
+  height: auto;
+}
+
+.sidebar-brand-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.2;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #A8CAC6;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-link-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.sidebar-link.active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.sidebar-link.active .sidebar-link-icon {
+  background: #fff;
+  color: #14534E;
+}
+
+.sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+}
+
+.sidebar-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  flex-shrink: 0;
+}
+
+.sidebar-profile-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar-profile-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-profile-role {
+  font-size: 9.5px;
+  color: #A8CAC6;
+  font-family: 'Poppins', sans-serif;
+}
+
+.sidebar-signout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #A8CAC6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  text-align: left;
+}
+
+.sidebar-signout:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}

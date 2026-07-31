@@ -4,3 +4,5 @@
 Frontend/node_modules/
 Frontend/dist/
 Frontend/.vite/
+venv/
+logs/
