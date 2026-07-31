@@ -77,13 +77,19 @@ export default function UserManagement() {
   const activeAdmins = users.filter((u) => u.status === "active").length;
   const suspendedAccounts = users.filter((u) => u.status === "suspended").length;
 
-  function toggleSelect(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  }
+function toggleSelect(id: string) {
+  setSelected((prev) => {
+    const next = new Set(prev);
+
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+
+    return next;
+  });
+}
 
   function toggleSelectAll() {
     setSelected((prev) =>

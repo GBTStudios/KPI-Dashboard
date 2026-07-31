@@ -8,7 +8,7 @@ import KpiEntry from "./pages/KpiEntry";
 import ImportData from "./pages/ImportData";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
-import ProtectedRoute from "./components/ProtectedRoute";
+// import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import "./index.css";
 
