@@ -91,7 +91,7 @@ export default function SignUp() {
     e.preventDefault();
     setSubmitError("");
 
-    const fields: (keyof FieldErrors)[] = ["fullName", "email", "password", "confirmPassword", "agreed"];
+    const fields: (keyof FieldErrors)[] = ["fullName", "email", "password", "confirmPassword"];
     const newErrors: FieldErrors = {};
     fields.forEach((f) => {
       const err = validateField(f);

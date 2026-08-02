@@ -1,0 +1,645 @@
+2026-08-02 20:49:34,716 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-08-02 20:55:40,723 | ERROR | req_id=247a2a15-9348-4a05-943f-691405ef5ed3 user_id=- | groundpulse | Session rolled back due to unexpected error
+Traceback (most recent call last):
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\dependencies\db.py", line 20, in get_db
+    yield session
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 55, in signup
+    user = await service.signup(
+                 ~~~~~~~~~~~~~~^
+        full_name=payload.full_name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    
+    
+    )
+    ^
+TypeError: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+2026-08-02 20:55:40,823 | CRITICAL | req_id=247a2a15-9348-4a05-943f-691405ef5ed3 user_id=- | groundpulse | POST /api/v1/auth/signup -> UNHANDLED_EXCEPTION (111.16ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 20:55:40,824 | CRITICAL | req_id=247a2a15-9348-4a05-943f-691405ef5ed3 user_id=- | groundpulse | Unhandled exception path=/api/v1/auth/signup: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 77, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 186, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py", line 815, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    |     await self.simple_response(scope, receive, send, request_headers=headers)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |          ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |          ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 735, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 288, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 76, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 73, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 55, in signup
+    |     user = await service.signup(
+    |                  ~~~~~~~~~~~~~~^
+    |         full_name=payload.full_name,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<2 lines>...
+    |     
+    |     
+    |     )
+    |     ^
+    | TypeError: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+         ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+         ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 55, in signup
+    user = await service.signup(
+                 ~~~~~~~~~~~~~~^
+        full_name=payload.full_name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    
+    
+    )
+    ^
+TypeError: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+2026-08-02 21:44:54,158 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
+2026-08-02 21:45:04,137 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-08-02 21:45:26,276 | ERROR | req_id=1a9687dc-b488-4469-b234-9a66ce4c853e user_id=- | groundpulse | Session rolled back due to unexpected error
+Traceback (most recent call last):
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\dependencies\db.py", line 20, in get_db
+    yield session
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 55, in signup
+    user = await service.signup(
+                 ~~~~~~~~~~~~~~^
+        full_name=payload.full_name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    
+    
+    )
+    ^
+TypeError: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+2026-08-02 21:45:26,282 | CRITICAL | req_id=1a9687dc-b488-4469-b234-9a66ce4c853e user_id=- | groundpulse | POST /api/v1/auth/signup -> UNHANDLED_EXCEPTION (20.92ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 21:45:26,282 | CRITICAL | req_id=1a9687dc-b488-4469-b234-9a66ce4c853e user_id=- | groundpulse | Unhandled exception path=/api/v1/auth/signup: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 77, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 186, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py", line 815, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    |     await self.simple_response(scope, receive, send, request_headers=headers)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |          ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |          ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 735, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 288, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 76, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 73, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 55, in signup
+    |     user = await service.signup(
+    |                  ~~~~~~~~~~~~~~^
+    |         full_name=payload.full_name,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<2 lines>...
+    |     
+    |     
+    |     )
+    |     ^
+    | TypeError: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+         ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+         ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 55, in signup
+    user = await service.signup(
+                 ~~~~~~~~~~~~~~^
+        full_name=payload.full_name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    
+    
+    )
+    ^
+TypeError: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+2026-08-02 21:45:32,614 | ERROR | req_id=924ff9c1-5979-4a5d-baca-01395d970a36 user_id=- | groundpulse | Session rolled back due to unexpected error
+Traceback (most recent call last):
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\dependencies\db.py", line 20, in get_db
+    yield session
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 55, in signup
+    user = await service.signup(
+                 ~~~~~~~~~~~~~~^
+        full_name=payload.full_name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    
+    
+    )
+    ^
+TypeError: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+2026-08-02 21:45:32,621 | CRITICAL | req_id=924ff9c1-5979-4a5d-baca-01395d970a36 user_id=- | groundpulse | POST /api/v1/auth/signup -> UNHANDLED_EXCEPTION (21.23ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 21:45:32,622 | CRITICAL | req_id=924ff9c1-5979-4a5d-baca-01395d970a36 user_id=- | groundpulse | Unhandled exception path=/api/v1/auth/signup: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 77, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 186, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\_backends\_asyncio.py", line 815, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    |     await self.simple_response(scope, receive, send, request_headers=headers)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |          ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |          ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 735, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 288, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 76, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 73, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 55, in signup
+    |     user = await service.signup(
+    |                  ~~~~~~~~~~~~~~^
+    |         full_name=payload.full_name,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<2 lines>...
+    |     
+    |     
+    |     )
+    |     ^
+    | TypeError: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+         ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+         ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\OneDrive\Desktop\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 55, in signup
+    user = await service.signup(
+                 ~~~~~~~~~~~~~~^
+        full_name=payload.full_name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    
+    
+    )
+    ^
+TypeError: AuthService.signup() missing 1 required positional argument: 'accepted_terms'
