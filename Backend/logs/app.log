@@ -1,0 +1,638 @@
+2026-08-02 19:48:01,857 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-08-02 19:50:58,945 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
+2026-08-02 19:51:01,109 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-08-02 19:53:40,437 | INFO | req_id=3dff1469-398c-4c31-b38d-875cd39a687f user_id=- | groundpulse | GET /docs -> 200 (2.78ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 19:53:41,939 | INFO | req_id=f3c9a6c5-16cd-4b18-ae85-384cf3a64e96 user_id=- | groundpulse | GET /openapi.json -> 200 (17.46ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 19:55:44,634 | ERROR | req_id=8a69e503-b4fd-47bf-9cc3-e2a3f5149567 user_id=- | groundpulse | Session rolled back due to unexpected error
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\dependencies\db.py", line 20, in get_db
+    yield session
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 123, in forgot_password
+    await service.request_password_reset(payload.email)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AuthService' object has no attribute 'request_password_reset'
+2026-08-02 19:55:44,693 | CRITICAL | req_id=8a69e503-b4fd-47bf-9cc3-e2a3f5149567 user_id=- | groundpulse | POST /api/v1/auth/forgot-password -> UNHANDLED_EXCEPTION (70.31ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 19:55:44,693 | CRITICAL | req_id=8a69e503-b4fd-47bf-9cc3-e2a3f5149567 user_id=- | groundpulse | Unhandled exception path=/api/v1/auth/forgot-password: 'AuthService' object has no attribute 'request_password_reset'
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 77, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 186, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 815, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    |     await self.simple_response(scope, receive, send, request_headers=headers)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 735, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 288, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 76, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 123, in forgot_password
+    |     await service.request_password_reset(payload.email)
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | AttributeError: 'AuthService' object has no attribute 'request_password_reset'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+  File "C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+  File "C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 123, in forgot_password
+    await service.request_password_reset(payload.email)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AuthService' object has no attribute 'request_password_reset'
+2026-08-02 20:00:59,352 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
+2026-08-02 20:01:02,398 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-08-02 20:03:11,015 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
+2026-08-02 20:03:13,244 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-08-02 20:03:49,265 | ERROR | req_id=1b6ef0aa-210d-4fb4-be7b-302dbd755664 user_id=- | groundpulse | Session rolled back due to unexpected error
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 514, in _prepare_and_execute
+    prepared_stmt, attributes = await adapt_connection._prepare(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 760, in _prepare
+    prepared_stmt = await self._connection.prepare(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\asyncpg\connection.py", line 638, in prepare
+    return await self._prepare(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\asyncpg\connection.py", line 657, in _prepare
+    stmt = await self._get_statement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\asyncpg\connection.py", line 443, in _get_statement
+    statement = await self._protocol.prepare(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "asyncpg/protocol/protocol.pyx", line 165, in prepare
+asyncpg.exceptions.UndefinedColumnError: column password_reset_tokens.code_hash does not exist
+HINT:  Perhaps you meant to reference the column "password_reset_tokens.token_hash".
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 572, in execute
+    self._adapt_connection.await_(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 550, in _prepare_and_execute
+    self._handle_exception(error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 501, in _handle_exception
+    self._adapt_connection._handle_exception(error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 784, in _handle_exception
+    raise translated_error from error
+sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_asyncpg_dbapi.ProgrammingError: <class 'asyncpg.exceptions.UndefinedColumnError'>: column password_reset_tokens.code_hash does not exist
+HINT:  Perhaps you meant to reference the column "password_reset_tokens.token_hash".
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\dependencies\db.py", line 20, in get_db
+    yield session
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 123, in forgot_password
+    await service.request_password_reset(payload.email)
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\services\auth_service.py", line 354, in request_password_reset
+    existing = await self.password_resets.get_active_by_user_id(user.id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\repositories\password_reset_repository.py", line 18, in get_active_by_user_id
+    result = await self.db.execute(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 461, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2247, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\orm\context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 572, in execute
+    self._adapt_connection.await_(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 550, in _prepare_and_execute
+    self._handle_exception(error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 501, in _handle_exception
+    self._adapt_connection._handle_exception(error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 784, in _handle_exception
+    raise translated_error from error
+sqlalchemy.exc.ProgrammingError: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedColumnError'>: column password_reset_tokens.code_hash does not exist
+HINT:  Perhaps you meant to reference the column "password_reset_tokens.token_hash".
+[SQL: SELECT password_reset_tokens.id, password_reset_tokens.user_id, password_reset_tokens.code_hash, password_reset_tokens.code_expires_at, password_reset_tokens.attempts, password_reset_tokens.verified, password_reset_tokens.verified_at, password_reset_tokens.reset_token_hash, password_reset_tokens.reset_token_expires_at, password_reset_tokens.used, password_reset_tokens.used_at, password_reset_tokens.created_at 
+FROM password_reset_tokens 
+WHERE password_reset_tokens.user_id = $1::UUID AND password_reset_tokens.used IS false ORDER BY password_reset_tokens.created_at DESC]
+[parameters: ('5b909c8c-3402-464f-b48c-1560a3721451',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-08-02 20:03:49,670 | ERROR | req_id=1b6ef0aa-210d-4fb4-be7b-302dbd755664 user_id=- | groundpulse | Database error path=/api/v1/auth/forgot-password: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedColumnError'>: column password_reset_tokens.code_hash does not exist
+HINT:  Perhaps you meant to reference the column "password_reset_tokens.token_hash".
+[SQL: SELECT password_reset_tokens.id, password_reset_tokens.user_id, password_reset_tokens.code_hash, password_reset_tokens.code_expires_at, password_reset_tokens.attempts, password_reset_tokens.verified, password_reset_tokens.verified_at, password_reset_tokens.reset_token_hash, password_reset_tokens.reset_token_expires_at, password_reset_tokens.used, password_reset_tokens.used_at, password_reset_tokens.created_at 
+FROM password_reset_tokens 
+WHERE password_reset_tokens.user_id = $1::UUID AND password_reset_tokens.used IS false ORDER BY password_reset_tokens.created_at DESC]
+[parameters: ('5b909c8c-3402-464f-b48c-1560a3721451',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 514, in _prepare_and_execute
+    prepared_stmt, attributes = await adapt_connection._prepare(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 760, in _prepare
+    prepared_stmt = await self._connection.prepare(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\asyncpg\connection.py", line 638, in prepare
+    return await self._prepare(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\asyncpg\connection.py", line 657, in _prepare
+    stmt = await self._get_statement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\asyncpg\connection.py", line 443, in _get_statement
+    statement = await self._protocol.prepare(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "asyncpg/protocol/protocol.pyx", line 165, in prepare
+asyncpg.exceptions.UndefinedColumnError: column password_reset_tokens.code_hash does not exist
+HINT:  Perhaps you meant to reference the column "password_reset_tokens.token_hash".
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 572, in execute
+    self._adapt_connection.await_(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 550, in _prepare_and_execute
+    self._handle_exception(error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 501, in _handle_exception
+    self._adapt_connection._handle_exception(error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 784, in _handle_exception
+    raise translated_error from error
+sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_asyncpg_dbapi.ProgrammingError: <class 'asyncpg.exceptions.UndefinedColumnError'>: column password_reset_tokens.code_hash does not exist
+HINT:  Perhaps you meant to reference the column "password_reset_tokens.token_hash".
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 123, in forgot_password
+    await service.request_password_reset(payload.email)
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\services\auth_service.py", line 354, in request_password_reset
+    existing = await self.password_resets.get_active_by_user_id(user.id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\repositories\password_reset_repository.py", line 18, in get_active_by_user_id
+    result = await self.db.execute(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 461, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2247, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\orm\context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 572, in execute
+    self._adapt_connection.await_(
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 550, in _prepare_and_execute
+    self._handle_exception(error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 501, in _handle_exception
+    self._adapt_connection._handle_exception(error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 784, in _handle_exception
+    raise translated_error from error
+sqlalchemy.exc.ProgrammingError: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedColumnError'>: column password_reset_tokens.code_hash does not exist
+HINT:  Perhaps you meant to reference the column "password_reset_tokens.token_hash".
+[SQL: SELECT password_reset_tokens.id, password_reset_tokens.user_id, password_reset_tokens.code_hash, password_reset_tokens.code_expires_at, password_reset_tokens.attempts, password_reset_tokens.verified, password_reset_tokens.verified_at, password_reset_tokens.reset_token_hash, password_reset_tokens.reset_token_expires_at, password_reset_tokens.used, password_reset_tokens.used_at, password_reset_tokens.created_at 
+FROM password_reset_tokens 
+WHERE password_reset_tokens.user_id = $1::UUID AND password_reset_tokens.used IS false ORDER BY password_reset_tokens.created_at DESC]
+[parameters: ('5b909c8c-3402-464f-b48c-1560a3721451',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-08-02 20:03:49,678 | WARNING | req_id=1b6ef0aa-210d-4fb4-be7b-302dbd755664 user_id=- | groundpulse | POST /api/v1/auth/forgot-password -> 500 (5908.98ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 20:05:26,751 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
+2026-08-02 20:06:10,393 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-08-02 20:06:41,732 | ERROR | req_id=2bb9e40d-2bd7-4d37-b94a-7ef46f0c9aa8 user_id=- | groundpulse | Session rolled back due to unexpected error
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\dependencies\db.py", line 20, in get_db
+    yield session
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 123, in forgot_password
+    await service.request_password_reset(payload.email)
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\services\auth_service.py", line 362, in request_password_reset
+    code_expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.PASSWORD_RESET_OTP_EXPIRE_MINUTES),
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\pydantic\main.py", line 856, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'Settings' object has no attribute 'PASSWORD_RESET_OTP_EXPIRE_MINUTES'
+2026-08-02 20:06:41,822 | CRITICAL | req_id=2bb9e40d-2bd7-4d37-b94a-7ef46f0c9aa8 user_id=- | groundpulse | POST /api/v1/auth/forgot-password -> UNHANDLED_EXCEPTION (5585.98ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 20:06:41,823 | CRITICAL | req_id=2bb9e40d-2bd7-4d37-b94a-7ef46f0c9aa8 user_id=- | groundpulse | Unhandled exception path=/api/v1/auth/forgot-password: 'Settings' object has no attribute 'PASSWORD_RESET_OTP_EXPIRE_MINUTES'
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 77, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 186, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 815, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    |     await self.simple_response(scope, receive, send, request_headers=headers)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    |     raise app_exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 735, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 288, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 76, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 123, in forgot_password
+    |     await service.request_password_reset(payload.email)
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\app\services\auth_service.py", line 362, in request_password_reset
+    |     code_expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.PASSWORD_RESET_OTP_EXPIRE_MINUTES),
+    |                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\pydantic\main.py", line 856, in __getattr__
+    |     raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+    | AttributeError: 'Settings' object has no attribute 'PASSWORD_RESET_OTP_EXPIRE_MINUTES'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\trustedhost.py", line 36, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+  File "C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 28, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 185, in __call__
+    with collapse_excgroups():
+  File "C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_utils.py", line 83, in collapse_excgroups
+    raise exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 187, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\middleware\logging_middleware.py", line 49, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 163, in call_next
+    raise app_exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\api\v1\auth\routes.py", line 123, in forgot_password
+    await service.request_password_reset(payload.email)
+  File "C:\Users\PC\KPI-Dashboard\Backend\app\services\auth_service.py", line 362, in request_password_reset
+    code_expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.PASSWORD_RESET_OTP_EXPIRE_MINUTES),
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\KPI-Dashboard\Backend\venv\Lib\site-packages\pydantic\main.py", line 856, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'Settings' object has no attribute 'PASSWORD_RESET_OTP_EXPIRE_MINUTES'
+2026-08-02 20:12:05,847 | INFO | req_id=- user_id=- | groundpulse | Application shutdown
+2026-08-02 20:12:07,978 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-08-02 20:12:09,936 | INFO | req_id=- user_id=- | groundpulse | Application startup - environment=development
+2026-08-02 20:13:06,274 | INFO | req_id=85a15782-a783-484f-a43a-59b04b78a778 user_id=- | groundpulse | SendGrid email sent to=mariamirembe43@gmail.com subject='Your GroundPulse password reset code' status=202
+2026-08-02 20:13:06,276 | INFO | req_id=85a15782-a783-484f-a43a-59b04b78a778 user_id=- | groundpulse | Password reset code issued user_id=5b909c8c-3402-464f-b48c-1560a3721451 email_sent=True
+2026-08-02 20:13:07,847 | INFO | req_id=85a15782-a783-484f-a43a-59b04b78a778 user_id=- | groundpulse | POST /api/v1/auth/forgot-password -> 200 (9226.19ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 20:14:03,909 | INFO | req_id=3b5c0a84-7222-46bf-b636-7720dbee9f48 user_id=- | groundpulse | Reset code verified user_id=5b909c8c-3402-464f-b48c-1560a3721451
+2026-08-02 20:14:04,911 | INFO | req_id=3b5c0a84-7222-46bf-b636-7720dbee9f48 user_id=- | groundpulse | POST /api/v1/auth/verify-reset-code -> 200 (2987.59ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 20:17:36,390 | INFO | req_id=8e5e42d5-0f72-4841-9be2-f063c70ca013 user_id=- | groundpulse | Password reset completed user_id=5b909c8c-3402-464f-b48c-1560a3721451
+2026-08-02 20:17:38,243 | INFO | req_id=8e5e42d5-0f72-4841-9be2-f063c70ca013 user_id=- | groundpulse | POST /api/v1/auth/reset-password -> 200 (5131.41ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 20:18:29,192 | INFO | req_id=313cef68-a24b-490c-bdd8-aa5628877abf user_id=- | groundpulse | Login attempt email=mariamirembe43@gmail.com
+2026-08-02 20:18:31,138 | WARNING | req_id=313cef68-a24b-490c-bdd8-aa5628877abf user_id=- | groundpulse | Failed login attempt #1 user_id=5b909c8c-3402-464f-b48c-1560a3721451
+2026-08-02 20:18:32,037 | WARNING | req_id=313cef68-a24b-490c-bdd8-aa5628877abf user_id=- | groundpulse | AppException: Invalid email or password. (INVALID_CREDENTIALS) path=/api/v1/auth/login
+2026-08-02 20:18:32,039 | WARNING | req_id=313cef68-a24b-490c-bdd8-aa5628877abf user_id=- | groundpulse | POST /api/v1/auth/login -> 401 (2854.42ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 20:19:12,636 | INFO | req_id=5d3e5b01-9bd3-486b-8b4f-32bb98450b2f user_id=- | groundpulse | Login attempt email=mariamirembe43@gmail.com
+2026-08-02 20:19:15,499 | INFO | req_id=5d3e5b01-9bd3-486b-8b4f-32bb98450b2f user_id=- | groundpulse | JWT created user_id=5b909c8c-3402-464f-b48c-1560a3721451 remember_me=False
+2026-08-02 20:19:15,501 | INFO | req_id=5d3e5b01-9bd3-486b-8b4f-32bb98450b2f user_id=- | groundpulse | Login success user_id=5b909c8c-3402-464f-b48c-1560a3721451
+2026-08-02 20:19:15,948 | INFO | req_id=5d3e5b01-9bd3-486b-8b4f-32bb98450b2f user_id=- | groundpulse | POST /api/v1/auth/login -> 200 (3316.68ms) ip=127.0.0.1 ua=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-08-02 20:38:51,237 | INFO | req_id=- user_id=- | groundpulse | Application shutdown

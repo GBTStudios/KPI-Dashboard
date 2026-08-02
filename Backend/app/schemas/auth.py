@@ -27,7 +27,7 @@ class SignupRequest(BaseModel):
             raise ValueError("PASSWORDS_DO_NOT_MATCH")
         return v
 
-    
+
 
 class VerifyEmailRequest(BaseModel):
     token: str
@@ -58,8 +58,17 @@ class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
 
+class VerifyResetCodeRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(min_length=6, max_length=6)
+
+
+class VerifyResetCodeResponseData(BaseModel):
+    reset_token: str
+
+
 class ResetPasswordRequest(BaseModel):
-    token: str
+    reset_token: str
     new_password: str
     confirm_password: str
 
@@ -69,7 +78,6 @@ class ResetPasswordRequest(BaseModel):
         if "new_password" in info.data and v != info.data["new_password"]:
             raise ValueError("PASSWORDS_DO_NOT_MATCH")
         return v
-
 
 class RefreshRequest(BaseModel):
     refresh_token: str

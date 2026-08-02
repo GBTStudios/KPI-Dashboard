@@ -21,7 +21,9 @@ class Settings(BaseSettings):
     MAX_FAILED_LOGIN_ATTEMPTS: int = 5
     ACCOUNT_LOCKOUT_MINUTES: int = 15
 
-    PASSWORD_RESET_TOKEN_EXPIRE_MINUTES: int = 30
+    PASSWORD_RESET_OTP_EXPIRE_MINUTES: int = 10
+    PASSWORD_RESET_TOKEN_EXPIRE_MINUTES: int = 15  # stage-2 token, after code is verified
+    MAX_RESET_CODE_ATTEMPTS: int = 5
     FRONTEND_RESET_PASSWORD_URL: str = "http://localhost:3000/reset-password"
 
     GOOGLE_CLIENT_ID: str = ""

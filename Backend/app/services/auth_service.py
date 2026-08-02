@@ -5,6 +5,7 @@ All datetime comparisons against DB-stored timestamps are done in UTC and
 explicitly normalized to timezone-aware values before comparison, since
 SQLite (used in tests) does not preserve tzinfo the way Postgres does.
 """
+import random
 import logging
 import secrets
 import uuid
@@ -29,6 +30,8 @@ from app.exceptions.custom_exceptions import (
     EmailVerificationTokenInvalidException,
     InvalidCredentialsException,
     PasswordResetTokenInvalidException,
+    ResetCodeInvalidException,
+    ResetCodeLockedException,
     TokenRevokedException,
     UnauthorizedException,
 )
@@ -71,10 +74,9 @@ class AuthService:
     # ------------------------------------------------------------------
     # SIGNUP
     # ------------------------------------------------------------------
-    async def signup(self, full_name: str, email: str, password: str, accepted_terms: bool) -> User:
+    async def signup(self, full_name: str, email: str, password: str) -> User:
         email = email.lower().strip()
         logger.info("Signup attempt email=%s", email)
-
 
         existing = await self.users.get_by_email(email)
         if existing is not None:
@@ -89,8 +91,6 @@ class AuthService:
             full_name=full_name.strip(),
             email=email,
             password_hash=hash_password(password),
-            accepted_terms=accepted_terms,
-            accepted_terms_at=datetime.now(timezone.utc),
             is_active=True,
             is_verified=False,
         )
@@ -190,7 +190,6 @@ class AuthService:
                     avatar_url=profile.avatar_url,
                     is_active=True,
                     is_verified=profile.email_verified,
-                    
                 )
                 self.users.add(user)
                 await self.users.flush()
@@ -340,41 +339,82 @@ class AuthService:
         await self._issue_and_send_verification_email(user)
 
     # ------------------------------------------------------------------
-    # FORGOT PASSWORD / RESET PASSWORD
+    # FORGOT PASSWORD / RESET PASSWORD (6-digit OTP flow)
     # ------------------------------------------------------------------
-    async def request_password_reset(self, email: str) -> str | None:
+    async def request_password_reset(self, email: str) -> None:
+        """Always no-ops silently for unknown/Google-only accounts - never
+        reveals account existence. Invalidates any prior unused reset flow
+        for this user before issuing a fresh code (covers 'Resend')."""
         email = email.lower().strip()
         user = await self.users.get_by_email(email)
         if user is None or user.password_hash is None:
             logger.info("Password reset requested for non-resettable/unknown email=%s", email)
-            return None
+            return
 
-        raw_token = secrets.token_urlsafe(32)
+        existing = await self.password_resets.get_active_by_user_id(user.id)
+        if existing is not None:
+            existing.used = True
+
+        code = f"{random.randint(0, 999999):06d}"
         reset_row = PasswordResetToken(
             user_id=user.id,
-            token_hash=hash_token(raw_token),
-            expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES),
+            code_hash=hash_token(code),
+            code_expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.PASSWORD_RESET_OTP_EXPIRE_MINUTES),
         )
         self.password_resets.add(reset_row)
         await self.db.flush()
 
-        reset_link = f"{settings.FRONTEND_RESET_PASSWORD_URL}?token={raw_token}"
-        sent = email_service.send_password_reset_email(user.email, user.full_name, reset_link)
-
+        sent = email_service.send_password_reset_code_email(user.email, user.full_name, code)
         self.audit.add(
-            "PASSWORD_RESET_REQUESTED" if sent else "PASSWORD_RESET_SEND_FAILED",
-            user_id=user.id, description="Reset token issued",
+            "PASSWORD_RESET_CODE_SENT" if sent else "PASSWORD_RESET_CODE_SEND_FAILED",
+            user_id=user.id, description="Reset code issued",
             ip_address=self.ip_address, user_agent=self.user_agent,
         )
-        logger.info("Password reset token issued user_id=%s email_sent=%s", user.id, sent)
-        return raw_token
+        logger.info("Password reset code issued user_id=%s email_sent=%s", user.id, sent)
 
-    async def reset_password(self, raw_token: str, new_password: str) -> None:
+    async def verify_reset_code(self, email: str, code: str) -> str:
+        """Validates the 6-digit code, then issues and returns a raw stage-2
+        reset_token the frontend carries forward to the 'Create New Password'
+        screen."""
+        email = email.lower().strip()
+        user = await self.users.get_by_email(email)
+        if user is None:
+            raise ResetCodeInvalidException()
+
+        stored = await self.password_resets.get_active_by_user_id(user.id)
+        if stored is None or stored.verified or _aware(stored.code_expires_at) <= datetime.now(timezone.utc):
+            raise ResetCodeInvalidException()
+
+        if stored.attempts >= settings.MAX_RESET_CODE_ATTEMPTS:
+            raise ResetCodeLockedException()
+
+        if stored.code_hash != hash_token(code):
+            stored.attempts += 1
+            if stored.attempts >= settings.MAX_RESET_CODE_ATTEMPTS:
+                stored.used = True  # lock this flow out entirely; user must request a new code
+            raise ResetCodeInvalidException()
+
+        raw_reset_token = secrets.token_urlsafe(32)
+        stored.verified = True
+        stored.verified_at = datetime.now(timezone.utc)
+        stored.reset_token_hash = hash_token(raw_reset_token)
+        stored.reset_token_expires_at = datetime.now(timezone.utc) + timedelta(
+            minutes=settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES
+        )
+
+        self.audit.add("PASSWORD_RESET_CODE_VERIFIED", user_id=user.id, description="Reset code verified",
+                        ip_address=self.ip_address, user_agent=self.user_agent)
+        logger.info("Reset code verified user_id=%s", user.id)
+        return raw_reset_token
+
+    async def reset_password(self, reset_token: str, new_password: str) -> None:
         validate_password_strength(new_password)
 
-        token_hash = hash_token(raw_token)
-        stored = await self.password_resets.get_by_hash(token_hash)
-        if stored is None or stored.used or _aware(stored.expires_at) <= datetime.now(timezone.utc):
+        stored = await self.password_resets.get_by_reset_token_hash(hash_token(reset_token))
+        if (
+            stored is None or stored.used or not stored.verified
+            or _aware(stored.reset_token_expires_at) <= datetime.now(timezone.utc)
+        ):
             raise PasswordResetTokenInvalidException()
 
         user = await self.users.get_by_id(stored.user_id)

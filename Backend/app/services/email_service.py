@@ -77,27 +77,22 @@ def send_verification_email(to_email: str, full_name: str, verification_link: st
     return sent
 
 
-def send_password_reset_email(to_email: str, full_name: str, reset_link: str) -> bool:
-    subject = "Reset your GroundPulse password"
+def send_password_reset_code_email(to_email: str, full_name: str, code: str) -> bool:
+    subject = "Your GroundPulse password reset code"
     html = f"""
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
       <h2 style="color: #0f5c4c;">Password reset requested</h2>
-      <p>Hi {full_name}, we received a request to reset your GroundPulse password.</p>
+      <p>Hi {full_name}, use this code to reset your GroundPulse password:</p>
       <p style="text-align:center; margin: 32px 0;">
-        <a href="{reset_link}"
-           style="background:#5b6fee;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
-          Reset Password
-        </a>
+        <span style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#0f5c4c;">{code}</span>
       </p>
       <p style="color:#666;font-size:13px;">
-        This link expires in {settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES} minutes.
+        This code expires in {settings.PASSWORD_RESET_OTP_EXPIRE_MINUTES} minutes.
         If you didn't request this, you can safely ignore this email.
       </p>
     </div>
     """
     sent = _send(to_email, subject, html)
     if not sent:
-        # Whatever the reason (unverified sender, bad key, SendGrid outage),
-        # always leave the real link somewhere you can grab it for testing.
-        logger.warning("Verification email NOT delivered - link for manual testing: %s", reset_link)
+        logger.warning("Reset code email NOT delivered - code for manual testing: %s (email=%s)", code, to_email)
     return sent
