@@ -9,4 +9,5 @@ Frontend/.vite/
 Backend/venv/
 Backend/__pycache__/
 Backend/*.pyc
+venv/
 logs/

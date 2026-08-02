@@ -84,7 +84,8 @@ export default function Login() {
     setLoading(true);
     try {
       const data = await login({ email, password });
-      localStorage.setItem("authToken", data.access_token);
+localStorage.setItem("authToken", data.tokens.access_token);
+localStorage.setItem("refreshToken", data.tokens.refresh_token);
       navigate("/dashboard");
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Login failed. Please try again.");

@@ -105,7 +105,7 @@ export default function SignUp() {
 
     setLoading(true);
     try {
-      await signUp({ fullName, email, password });
+      await signUp({ fullName, email, password, confirmPassword });
       navigate("/login");
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Sign up failed. Please try again.");

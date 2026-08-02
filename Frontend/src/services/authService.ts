@@ -1,64 +1,106 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const AUTH_BASE = `${API_BASE_URL}/api/v1/auth`;
 
+// ---- Shared envelope types ----
+interface SuccessResponse<T> {
+  success: true;
+  message: string;
+  data: T;
+}
+
+interface ErrorResponse {
+  success: false;
+  message: string;
+  error_code: string;
+  details?: unknown;
+}
+
+// ---- Domain types ----
+interface UserOut {
+  id: string;
+  full_name: string;
+  email: string;
+  [key: string]: unknown;
+}
+
+interface TokenPair {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+}
+
+interface AuthResponseData {
+  user: UserOut;
+  tokens: TokenPair;
+}
+
+// ---- Shared request helper ----
+async function apiRequest<T>(path: string, body: unknown): Promise<T> {
+  const response = await fetch(`${AUTH_BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  const json = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const err = json as ErrorResponse | null;
+    throw new Error(err?.message || "Something went wrong. Please try again.");
+  }
+
+  const success = json as SuccessResponse<T>;
+  return success.data;
+}
+
+// ---- Sign up ----
 interface SignUpPayload {
   fullName: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
+export async function signUp({
+  fullName,
+  email,
+  password,
+  confirmPassword,
+}: SignUpPayload) {
+  return apiRequest<AuthResponseData | null>("/signup", {
+    full_name: fullName,
+    email,
+    password,
+    confirm_password: confirmPassword,
+  });
+}
+
+// ---- Login ----
 interface LoginPayload {
   email: string;
   password: string;
+  rememberMe?: boolean;
 }
 
-export async function signUp({ fullName, email, password }: SignUpPayload) {
-  const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ full_name: fullName, email, password }),
+export async function login({
+  email,
+  password,
+  rememberMe = false,
+}: LoginPayload) {
+  return apiRequest<AuthResponseData>("/login", {
+    email,
+    password,
+    remember_me: rememberMe,
   });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || "Sign up failed. Please try again.");
-  }
-
-  return response.json();
 }
 
-export async function login({ email, password }: LoginPayload) {
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || "Invalid email or password.");
-  }
-
-  return response.json();
-}
-
+// ---- Forgot password ----
 interface ForgotPasswordPayload {
   email: string;
 }
 
 export async function requestPasswordReset({ email }: ForgotPasswordPayload) {
-  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      errorData.detail || "Something went wrong. Please try again.",
-    );
-  }
-
-  return response.json();
+  return apiRequest<null>("/forgot-password", { email });
 }
