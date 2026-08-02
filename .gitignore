@@ -7,7 +7,10 @@ Frontend/.vite/
 
 # Python (Backend)
 Backend/venv/
-Backend/__pycache__/
-Backend/*.pyc
+Backend/**/__pycache__/
+Backend/**/*.pyc
 venv/
 logs/
+*.log
+__pycache__/
+*.pyc
