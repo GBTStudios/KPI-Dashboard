@@ -222,20 +222,6 @@ export default function SignUp() {
                 At least 8 characters with a mix of letters and numbers.
               </span>
 
-              <div className="form-checkbox">
-                <input
-                  id="agree"
-                  type="checkbox"
-                  checked={agreed}
-                  onChange={(e) => handleChange("agreed", e.target.checked)}
-                  onBlur={() => handleBlur("agreed")}
-                />
-                <label htmlFor="agree">
-                  I agree to the <a href="/terms">Terms of Service</a> and{" "}
-                  <a href="/privacy">Privacy Policy</a>.
-                </label>
-              </div>
-              {errors.agreed && <span className="field-error checkbox-error">{errors.agreed}</span>}
 
               {submitError && <p className="form-error">{submitError}</p>}
 
