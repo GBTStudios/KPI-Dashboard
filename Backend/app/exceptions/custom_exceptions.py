@@ -47,12 +47,7 @@ class WeakPasswordException(AppException):
         super().__init__(reason)
 
 
-class TermsNotAcceptedException(AppException):
-    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-    error_code = "TERMS_NOT_ACCEPTED"
 
-    def __init__(self):
-        super().__init__("You must accept the Terms of Service and Privacy Policy.")
 
 
 class InvalidCredentialsException(AppException):
@@ -62,6 +57,12 @@ class InvalidCredentialsException(AppException):
     def __init__(self):
         super().__init__("Invalid email or password.")
 
+class EmailVerificationTokenInvalidException(AppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    error_code = "EMAIL_VERIFICATION_TOKEN_INVALID"
+
+    def __init__(self):
+        super().__init__("This verification link is invalid, expired, or already used.")
 
 class AccountInactiveException(AppException):
     status_code = status.HTTP_403_FORBIDDEN

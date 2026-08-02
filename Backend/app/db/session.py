@@ -8,6 +8,7 @@ engine = create_async_engine(
     echo=False,
     pool_pre_ping=True,
     future=True,
+    connect_args={"statement_cache_size": 0},  # required for Supabase's transaction-mode pooler (port 6543)
 )
 
 AsyncSessionLocal = async_sessionmaker(

@@ -19,10 +19,15 @@ export default function Layout() {
     navigate("/login");
   }
 
-  async function handleSaveProfile(data: { fullName: string; avatarFile: File | null }) {
-    // TODO: call profile update service once backend endpoint exists
-    setShowProfileModal(false);
-  }
+async function handleSaveProfile(data: {
+  fullName: string;
+  avatarFile: File | null;
+}) {
+  console.log(data); // Temporary so ESLint sees the parameter is used
+
+  // TODO: call profile update service once backend endpoint exists
+  setShowProfileModal(false);
+}
 
   return (
     <div className="app-layout">
