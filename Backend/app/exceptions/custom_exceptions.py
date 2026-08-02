@@ -151,17 +151,24 @@ class GoogleAccountConflictException(AppException):
         super().__init__("An account with this email already exists. Log in with your password first, then link Google from settings.")
 
 
+class ResetCodeInvalidException(AppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    error_code = "RESET_CODE_INVALID"
+
+    def __init__(self):
+        super().__init__("That code is incorrect or has expired.")
+
+
+class ResetCodeLockedException(AppException):
+    status_code = status.HTTP_429_TOO_MANY_REQUESTS
+    error_code = "RESET_CODE_LOCKED"
+
+    def __init__(self):
+        super().__init__("Too many incorrect attempts. Please request a new code.")
+        
 class PasswordResetTokenInvalidException(AppException):
     status_code = status.HTTP_400_BAD_REQUEST
     error_code = "RESET_TOKEN_INVALID"
 
     def __init__(self):
         super().__init__("This password reset link is invalid or has expired.")
-
-
-class ValidationFailedException(AppException):
-    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-    error_code = "VALIDATION_FAILED"
-
-    def __init__(self, message: str = "Validation failed."):
-        super().__init__(message)
