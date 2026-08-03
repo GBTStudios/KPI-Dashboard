@@ -87,6 +87,8 @@ export default function SignUp() {
     }
   }
 
+
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitError("");
@@ -114,11 +116,20 @@ export default function SignUp() {
     }
   }
 
+  function handleGoogleSignUp() {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+    window.location.href = `${apiBaseUrl}/auth/google`;
+  }
+
   return (
     <div className="signup-page">
       <div className="signup-card">
         <div className="signup-panel">
-          <img src={logo} alt="Groundbreaker Talents logo" className="signup-logo" />
+          <img
+            src={logo}
+            alt="Groundbreaker Talents logo"
+            className="signup-logo"
+          />
           <p className="signup-copyright">© 2026 All rights reserved.</p>
         </div>
 
@@ -126,14 +137,17 @@ export default function SignUp() {
           <div className="signup-form-wrapper">
             <h2>Join Groundbreaker</h2>
             <p className="signup-subtitle">
-              Empower our team with the next generation of talent management tools.
+              Empower our team with the next generation of talent management
+              tools.
             </p>
 
             <form onSubmit={handleSubmit} autoComplete="off" noValidate>
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="fullName">Full Name</label>
-                  <div className={`input-with-icon ${errors.fullName ? "input-error" : ""}`}>
+                  <div
+                    className={`input-with-icon ${errors.fullName ? "input-error" : ""}`}
+                  >
                     <User size={14} className="input-icon" />
                     <input
                       id="fullName"
@@ -145,12 +159,16 @@ export default function SignUp() {
                       autoComplete="off"
                     />
                   </div>
-                  {errors.fullName && <span className="field-error">{errors.fullName}</span>}
+                  {errors.fullName && (
+                    <span className="field-error">{errors.fullName}</span>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="email">Email Address</label>
-                  <div className={`input-with-icon ${errors.email ? "input-error" : ""}`}>
+                  <div
+                    className={`input-with-icon ${errors.email ? "input-error" : ""}`}
+                  >
                     <Mail size={14} className="input-icon" />
                     <input
                       id="email"
@@ -162,14 +180,18 @@ export default function SignUp() {
                       autoComplete="off"
                     />
                   </div>
-                  {errors.email && <span className="field-error">{errors.email}</span>}
+                  {errors.email && (
+                    <span className="field-error">{errors.email}</span>
+                  )}
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="password">Password</label>
-                  <div className={`input-with-icon ${errors.password ? "input-error" : ""}`}>
+                  <div
+                    className={`input-with-icon ${errors.password ? "input-error" : ""}`}
+                  >
                     <Lock size={14} className="input-icon" />
                     <input
                       id="password"
@@ -189,19 +211,25 @@ export default function SignUp() {
                       {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
                   </div>
-                  {errors.password && <span className="field-error">{errors.password}</span>}
+                  {errors.password && (
+                    <span className="field-error">{errors.password}</span>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="confirmPassword">Confirm Password</label>
-                  <div className={`input-with-icon ${errors.confirmPassword ? "input-error" : ""}`}>
+                  <div
+                    className={`input-with-icon ${errors.confirmPassword ? "input-error" : ""}`}
+                  >
                     <Lock size={14} className="input-icon" />
                     <input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="Re-enter password"
                       value={confirmPassword}
-                      onChange={(e) => handleChange("confirmPassword", e.target.value)}
+                      onChange={(e) =>
+                        handleChange("confirmPassword", e.target.value)
+                      }
                       onBlur={() => handleBlur("confirmPassword")}
                       autoComplete="new-password"
                     />
@@ -211,10 +239,18 @@ export default function SignUp() {
                       onClick={() => setShowConfirmPassword((v) => !v)}
                       aria-label="Toggle confirm password visibility"
                     >
-                      {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                      {showConfirmPassword ? (
+                        <EyeOff size={14} />
+                      ) : (
+                        <Eye size={14} />
+                      )}
                     </button>
                   </div>
-                  {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
+                  {errors.confirmPassword && (
+                    <span className="field-error">
+                      {errors.confirmPassword}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -222,15 +258,22 @@ export default function SignUp() {
                 At least 8 characters with a mix of letters and numbers.
               </span>
 
-
               {submitError && <p className="form-error">{submitError}</p>}
 
               <div className="form-actions">
-                <button type="submit" className="btn-primary" disabled={loading}>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={loading}
+                >
                   {loading ? "Signing up..." : "Sign Up"}
                 </button>
                 <span className="or-divider">OR</span>
-                <button type="button" className="btn-google">
+                <button
+                  type="button"
+                  className="btn-google"
+                  onClick={handleGoogleSignUp}
+                >
                   <GoogleIcon /> Sign up with Google
                 </button>
               </div>

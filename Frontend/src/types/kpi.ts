@@ -27,3 +27,7 @@ export const MONTHS = [
 export function getEndOfYearActual(monthlyActual: (number | null)[]): number {
   return monthlyActual.reduce((sum: number, val) => sum + (val ?? 0), 0);
 }
+
+export function getEndOfYearTarget(monthlyTarget: number[]): number {
+  return monthlyTarget.reduce((sum: number, val) => sum + (val ?? 0), 0);
+}

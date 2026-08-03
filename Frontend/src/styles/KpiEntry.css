@@ -386,6 +386,17 @@ thead .kpi-sticky {
   gap: 2px;
 }
 
+.kpi-eoy-actual {
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.kpi-eoy-target {
+  font-size: 11px;
+  font-weight: 500;
+  color: #0F172A;
+}
+
 .kpi-eoy-pct {
   font-size: 10.5px;
   font-weight: 600;
