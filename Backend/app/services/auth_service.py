@@ -295,7 +295,7 @@ class AuthService:
         self.email_verifications.add(token_row)
         await self.db.flush()
 
-        verification_link = f"{settings.FRONTEND_VERIFY_EMAIL_URL}?token={raw_token}"
+        verification_link = f"{settings.BACKEND_BASE_URL}{settings.API_V1_PREFIX}/auth/verify-email?token={raw_token}"
         sent = email_service.send_verification_email(user.email, user.full_name, verification_link)
 
         self.audit.add(

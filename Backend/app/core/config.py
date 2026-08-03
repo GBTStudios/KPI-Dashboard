@@ -34,9 +34,9 @@ class Settings(BaseSettings):
     SENDGRID_FROM_NAME: str = "GroundPulse"
 
     # ---- Email verification ----
-    EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
-    FRONTEND_VERIFY_EMAIL_URL: str = "http://localhost:3000/verify-email"
-
+    EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES: int = 30  # 24 hours
+    BACKEND_BASE_URL: str = "http://localhost:8000"
+    FRONTEND_LOGIN_URL: str = "http://localhost:5173/login"
     CORS_ORIGINS: str = "*"
     TRUSTED_HOSTS: str = "*"
 

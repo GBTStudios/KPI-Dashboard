@@ -7,11 +7,14 @@ all business logic lives in AuthService.
 import logging
 
 from fastapi import APIRouter, Depends, Request, status
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.rate_limit import enforce_rate_limit
 from app.dependencies.auth import get_client_ip, get_current_user, get_user_agent
 from app.dependencies.db import get_db
+from app.exceptions.custom_exceptions import AppException
 from app.schemas.auth import (
     AuthResponseData,
     ForgotPasswordRequest,
@@ -43,22 +46,18 @@ def _service(db: AsyncSession, request: Request) -> AuthService:
     "/signup",
     response_model=SuccessResponse[UserOut],
     status_code=status.HTTP_201_CREATED,
-    summary="Create a new account (Full Name / Email / Password / Confirm Password / Terms)",
+    summary="Create a new account (Full Name / Email / Password / Confirm Password)",
     responses={
         409: {"description": "Email already exists"},
-        422: {"description": "Passwords do not match, weak password, or terms not accepted"},
+        422: {"description": "Passwords do not match or weak password"},
     },
 )
 async def signup(payload: SignupRequest, request: Request, db: AsyncSession = Depends(get_db)):
-    """Matches the Signup screen exactly. Does NOT auto-login - frontend
-    routes to Login after. Sends a verification email via SendGrid as part
-    of this request (best-effort - never fails signup itself)."""
     service = _service(db, request)
     user = await service.signup(
         full_name=payload.full_name,
         email=payload.email,
         password=payload.password,
-
     )
     return SuccessResponse(
         message="Account created successfully. Please check your email to verify your account, then log in.",
@@ -147,3 +146,59 @@ async def reset_password(payload: ResetPasswordRequest, request: Request, db: As
     service = _service(db, request)
     await service.reset_password(payload.reset_token, payload.new_password)
     return SuccessResponse(message="Password has been reset. Please log in with your new password.")
+
+
+# ----------------------------------------------------------------------
+# EMAIL VERIFICATION - Option B: the emailed link points HERE directly
+# (a GET on the backend), which verifies the token itself and redirects
+# the browser straight to the frontend's login page. No frontend page
+# needed for this flow at all.
+# ----------------------------------------------------------------------
+@router.get(
+    "/verify-email",
+    include_in_schema=False,
+    summary="Verify email via link (backend-handled, redirects to frontend login)",
+)
+async def verify_email_via_link(token: str, request: Request, db: AsyncSession = Depends(get_db)):
+    service = _service(db, request)
+    try:
+        await service.verify_email(token)
+        return RedirectResponse(f"{settings.FRONTEND_LOGIN_URL}?verified=true")
+    except AppException as exc:
+        logger.warning("Email verification link failed: %s (%s)", exc.message, exc.error_code)
+        return RedirectResponse(f"{settings.FRONTEND_LOGIN_URL}?verified=false&reason={exc.error_code}")
+
+
+@router.post(
+    "/verify-email",
+    response_model=SuccessResponse[UserOut],
+    summary="Confirm an account's email address using a token (JSON API - for testing/tooling)",
+    description=(
+        "The real email link uses the GET version above and redirects "
+        "automatically. This POST version exists for Swagger/API testing "
+        "without needing to click a real email link."
+    ),
+    responses={400: {"description": "Verification token invalid, expired, or already used"}},
+)
+async def verify_email(payload: VerifyEmailRequest, request: Request, db: AsyncSession = Depends(get_db)):
+    service = _service(db, request)
+    user = await service.verify_email(payload.token)
+    return SuccessResponse(message="Email verified successfully.", data=UserOut.model_validate(user))
+
+
+@router.post(
+    "/resend-verification",
+    response_model=SuccessResponse[None],
+    summary="Resend the account verification email",
+    description="Always returns a generic success message, whether or not the email is registered or already verified.",
+)
+async def resend_verification(payload: ResendVerificationRequest, request: Request, db: AsyncSession = Depends(get_db)):
+    enforce_rate_limit(f"resend-verification:{get_client_ip(request)}", max_attempts=5, window_seconds=300)
+    service = _service(db, request)
+    await service.resend_verification_email(payload.email)
+    return SuccessResponse(message="If that email is registered and not yet verified, a new link has been sent.")
+
+
+@router.get("/me", response_model=SuccessResponse[UserOut], summary="Get the current authenticated user")
+async def get_me(current_user=Depends(get_current_user)):
+    return SuccessResponse(message="OK", data=UserOut.model_validate(current_user))

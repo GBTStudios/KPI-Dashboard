@@ -52,11 +52,11 @@ def _send(to_email: str, subject: str, html_content: str) -> bool:
 
 
 def send_verification_email(to_email: str, full_name: str, verification_link: str) -> bool:
-    subject = "Verify your GroundPulse account"
+    subject = "Verify your account"
     html = f"""
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
       <h2 style="color: #0f5c4c;">Welcome to Groundbreaker Talents, {full_name}!</h2>
-      <p>Please confirm your email address to activate your GroundPulse account.</p>
+      <p>Please confirm your email address to activate your account.</p>
       <p style="text-align:center; margin: 32px 0;">
         <a href="{verification_link}"
            style="background:#5b6fee;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
@@ -82,7 +82,7 @@ def send_password_reset_code_email(to_email: str, full_name: str, code: str) -> 
     html = f"""
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
       <h2 style="color: #0f5c4c;">Password reset requested</h2>
-      <p>Hi {full_name}, use this code to reset your GroundPulse password:</p>
+      <p>Hi {full_name}, use this code to reset your password:</p>
       <p style="text-align:center; margin: 32px 0;">
         <span style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#0f5c4c;">{code}</span>
       </p>
