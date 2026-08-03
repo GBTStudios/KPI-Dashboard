@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.verify-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  background: #FFFFFF;
+  font-family: 'Poppins', sans-serif;
+  padding: 24px;
+}
+
+.verify-card {
+  width: 100%;
+  max-width: 560px;
+  background: #ffffff;
+  border: 1px solid #F1F5F9;
+  border-radius: 18px;
+  padding: 48px 40px;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.10), 0 4px 10px rgba(15, 23, 42, 0.05);
+}
+
+.verify-logo {
+  width: 36px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.verify-brand {
+  font-size: 13px;
+  font-weight: 600;
+  color: #14534E;
+  margin-bottom: 20px;
+}
+
+.verify-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 14px;
+}
+
+.verify-subtitle {
+  font-size: 13px;
+  color: #64748B;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.verify-email-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #F8F9FA;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin: 16px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #14534E;
+}
+
+.verify-hint {
+  font-size: 12.5px;
+  color: #94A3B8;
+  margin: 16px 0 20px;
+}
+
+.verify-resend-label {
+  font-size: 12px;
+  color: #94A3B8;
+  margin-bottom: 10px;
+}
+
+.verify-resend-btn {
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: #4F46E5;
+  border: none;
+  color: #fff;
+  border-radius: 7px;
+  padding: 9px 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+}
+
+.verify-resend-btn:hover {
+  background: #4338CA;
+}
+
+.verify-resend-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.verify-resend-btn .spin {
+  animation: verify-spin 0.8s linear infinite;
+}
+
+@keyframes verify-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.verify-resend-success {
+  font-size: 12px;
+  color: #16A34A;
+  margin-top: 10px;
+}
+
+.verify-resend-error {
+  font-size: 12px;
+  color: #DC2626;
+  margin-top: 10px;
+}
+
+.verify-back-link {
+  font-size: 12.5px;
+  color: #64748B;
+  margin-top: 24px;
+}
+
+.verify-back-link a {
+  color: #4F46E5;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.verify-back-link a:hover {
+  text-decoration: none;
+}

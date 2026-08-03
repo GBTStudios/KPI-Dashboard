@@ -63,8 +63,8 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      // TODO: call resetPassword service once backend endpoint exists
-      navigate("/login");
+      // TODO: call resetPassword service once backend endpoint is wired
+      navigate("/reset-password-success");
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
@@ -140,36 +140,36 @@ export default function ResetPassword() {
               </div>
 
               {password.length > 0 && (
-              <div className="strength-box">
-                <div className="strength-header">
-                  <span>Password strength</span>
-                  <span className="strength-label" style={{ color: strength.color }}>
-                    {strength.label}
-                  </span>
+                <div className="strength-box">
+                  <div className="strength-header">
+                    <span>Password strength</span>
+                    <span className="strength-label" style={{ color: strength.color }}>
+                      {strength.label}
+                    </span>
+                  </div>
+                  <div className="strength-bars">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        className="strength-bar"
+                        style={{
+                          background: i <= strength.level ? strength.color : "#E2E8F0",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div className="requirements-grid">
+                    {requirements.map((req) => {
+                      const met = req.test(password);
+                      return (
+                        <div key={req.label} className={`requirement ${met ? "met" : ""}`}>
+                          <span className="requirement-dot" />
+                          {req.label}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="strength-bars">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="strength-bar"
-                      style={{
-                        background: i <= strength.level ? strength.color : "#E2E8F0",
-                      }}
-                    />
-                  ))}
-                </div>
-                <div className="requirements-grid">
-                  {requirements.map((req) => {
-                    const met = req.test(password);
-                    return (
-                      <div key={req.label} className={`requirement ${met ? "met" : ""}`}>
-                        <span className="requirement-dot" />
-                        {req.label}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
               )}
 
               {submitError && <p className="form-error">{submitError}</p>}

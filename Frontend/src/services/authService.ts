@@ -104,3 +104,45 @@ interface ForgotPasswordPayload {
 export async function requestPasswordReset({ email }: ForgotPasswordPayload) {
   return apiRequest<null>("/forgot-password", { email });
 }
+
+interface ResendVerificationPayload {
+  email: string;
+}
+
+export async function resendVerificationEmail({
+  email,
+}: ResendVerificationPayload) {
+  const response = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Could not resend verification email.");
+  }
+
+  return response.json();
+}
+
+interface VerifyEmailPayload {
+  token: string;
+}
+
+export async function verifyEmail({ token }: VerifyEmailPayload) {
+  const response = await fetch(`${API_BASE_URL}/api/auth/verify-email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.detail || "Invalid or expired code. Please try again.",
+    );
+  }
+
+  return response.json();
+}
