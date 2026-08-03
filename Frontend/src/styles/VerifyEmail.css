@@ -75,24 +75,24 @@
 }
 
 .verify-resend-btn {
-  width: 100%;
-  display: flex;
+  width: auto;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: #fff;
-  border: 1px solid #14534E;
-  color: #14534E;
-  border-radius: 8px;
-  padding: 11px;
-  font-size: 13px;
+  gap: 7px;
+  background: #4F46E5;
+  border: none;
+  color: #fff;
+  border-radius: 7px;
+  padding: 9px 18px;
+  font-size: 12.5px;
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
 }
 
 .verify-resend-btn:hover {
-  background: #F0F7F6;
+  background: #4338CA;
 }
 
 .verify-resend-btn:disabled {
@@ -128,7 +128,11 @@
 }
 
 .verify-back-link a {
-  color: #64748B;
+  color: #4F46E5;
   text-decoration: none;
   font-weight: 500;
+}
+
+.verify-back-link a:hover {
+  text-decoration: none;
 }

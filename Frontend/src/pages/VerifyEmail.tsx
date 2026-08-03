@@ -19,7 +19,10 @@ export default function VerifyEmail() {
   const [resendError, setResendError] = useState("");
 
   async function handleResend() {
-    if (!email) return;
+    if (!email) {
+      setResendError("We don't have your email on this screen. Please sign up again to resend.");
+      return;
+    }
     setResending(true);
     setResendMessage("");
     setResendError("");
@@ -51,22 +54,16 @@ export default function VerifyEmail() {
             <span>{email}</span>
           </div>
         )}
+        
+        <p className="verify-resend-label">Didn't receive the email?</p>
 
-        <p className="verify-hint">After verifying your email, proceed to sign in to continue.</p>
+        <button type="button" className="verify-resend-btn" onClick={handleResend} disabled={resending}>
+          <RefreshCw size={15} className={resending ? "spin" : ""} />
+          {resending ? "Resending..." : "Resend Verification Email"}
+        </button>
 
-        {email && (
-          <>
-            <p className="verify-resend-label">Didn't receive the email?</p>
-
-            <button type="button" className="verify-resend-btn" onClick={handleResend} disabled={resending}>
-              <RefreshCw size={15} className={resending ? "spin" : ""} />
-              {resending ? "Resending..." : "Resend Verification Email"}
-            </button>
-
-            {resendMessage && <p className="verify-resend-success">{resendMessage}</p>}
-            {resendError && <p className="verify-resend-error">{resendError}</p>}
-          </>
-        )}
+        {resendMessage && <p className="verify-resend-success">{resendMessage}</p>}
+        {resendError && <p className="verify-resend-error">{resendError}</p>}
 
         <p className="verify-back-link">
           <Link to="/signup">Back to Sign Up</Link>
