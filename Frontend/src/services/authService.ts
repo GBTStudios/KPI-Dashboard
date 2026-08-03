@@ -125,3 +125,24 @@ export async function resendVerificationEmail({
 
   return response.json();
 }
+
+interface VerifyEmailPayload {
+  token: string;
+}
+
+export async function verifyEmail({ token }: VerifyEmailPayload) {
+  const response = await fetch(`${API_BASE_URL}/api/auth/verify-email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.detail || "Invalid or expired code. Please try again.",
+    );
+  }
+
+  return response.json();
+}

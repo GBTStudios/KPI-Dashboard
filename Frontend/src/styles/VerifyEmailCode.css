@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.vc-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  background: #FFFFFF;
+  font-family: 'Poppins', sans-serif;
+  padding: 24px;
+}
+
+.vc-card {
+  width: 100%;
+  max-width: 560px;
+  background: #F8F9FA;
+  border-radius: 18px;
+  padding: 48px 40px;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.10), 0 4px 10px rgba(15, 23, 42, 0.05);
+}
+
+.vc-logo {
+  width: 36px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.vc-brand {
+  font-size: 13px;
+  font-weight: 600;
+  color: #14534E;
+  margin-bottom: 22px;
+}
+
+.vc-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 8px;
+}
+
+.vc-subtitle {
+  font-size: 13px;
+  color: #64748B;
+}
+
+.vc-email {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+  margin-top: 2px;
+  margin-bottom: 24px;
+}
+
+.vc-code-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.vc-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.vc-code-input {
+  width: 44px;
+  height: 52px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  color: #0F172A;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.vc-code-input:focus {
+  outline: none;
+  border-color: #4F46E5;
+}
+
+.vc-code-dash {
+  width: 10px;
+  height: 1px;
+  background: #CBD5E1;
+}
+
+.vc-error {
+  color: #DC2626;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.vc-resend-success {
+  color: #16A34A;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.vc-verifying {
+  color: #64748B;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.vc-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.vc-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748B;
+  text-decoration: none;
+}
+
+.vc-back-link:hover {
+  color: #334155;
+}
+
+.vc-resend-row {
+  font-size: 11.5px;
+  color: #64748B;
+}
+
+.vc-resend-link {
+  background: none;
+  border: none;
+  color: #4F46E5;
+  font-weight: 700;
+  font-size: 11.5px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.vc-resend-link:hover {
+  text-decoration: underline;
+}
+
+.vc-resend-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

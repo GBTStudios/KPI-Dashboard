@@ -10,6 +10,7 @@ import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
 import ResetPasswordSuccess from "./pages/ResetPasswordSuccess";
 import VerifyEmail from "./pages/VerifyEmail";
+import VerifyEmailCode from "./pages/VerifyEmailCode";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import "./index.css";
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/reset-password-success" element={<ResetPasswordSuccess />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/verify-email-code" element={<VerifyEmailCode />} />
 
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
