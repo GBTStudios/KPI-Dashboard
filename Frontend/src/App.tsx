@@ -11,6 +11,7 @@ import Settings from "./pages/Settings";
 import ResetPasswordSuccess from "./pages/ResetPasswordSuccess";
 import VerifyEmail from "./pages/VerifyEmail";
 import VerifyEmailCode from "./pages/VerifyEmailCode";
+import KpiUpdate from "./pages/KpiUpdate";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import "./index.css";
@@ -23,13 +24,17 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/reset-password-success" element={<ResetPasswordSuccess />} />
+        <Route
+          path="/reset-password-success"
+          element={<ResetPasswordSuccess />}
+        />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/verify-email-code" element={<VerifyEmailCode />} />
 
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/kpi-entry" element={<KpiEntry />} />
+          <Route path="/kpi-update" element={<KpiUpdate />} />
           <Route path="/import-data" element={<ImportData />} />
           <Route path="/user-management" element={<UserManagement />} />
           <Route path="/settings" element={<Settings />} />
