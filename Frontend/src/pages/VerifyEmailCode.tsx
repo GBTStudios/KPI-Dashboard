@@ -135,7 +135,7 @@ export default function VerifyEmailCode() {
         {verifying && <p className="vc-verifying">Verifying...</p>}
 
         <div className="vc-footer-row">
-          <Link to="/verify-email" className="vc-back-link">
+          <Link to="/forgot-password" className="vc-back-link">
             <ArrowLeft size={13} /> Back
           </Link>
           <span className="vc-resend-row">
