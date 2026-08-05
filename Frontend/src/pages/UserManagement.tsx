@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Users,
@@ -10,26 +11,9 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import { api, ApiError } from "../services/api";
+import type { AdminUser, AdminUserListResponse, AdminUserStats } from "../types/admin";
 import "../styles/UserManagement.css";
-
-type UserStatus = "active" | "suspended";
-
-interface OrgUser {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  status: UserStatus;
-  lastActivity: string;
-}
-
-const initialUsers: OrgUser[] = [
-  { id: "1", name: "Jane Doe", email: "jane.doe@insightflow.com", avatar: "/avatars/jane.png", status: "active", lastActivity: "2 mins ago" },
-  { id: "2", name: "Robert Chen", email: "robert.chen@insightflow.com", avatar: "/avatars/robert.png", status: "active", lastActivity: "1 hour ago" },
-  { id: "3", name: "Sarah Williams", email: "s.williams@insightflow.com", avatar: "/avatars/sarah.png", status: "suspended", lastActivity: "Never" },
-  { id: "4", name: "Michael Scott", email: "m.scott@insightflow.com", avatar: "/avatars/michael.png", status: "suspended", lastActivity: "3 days ago" },
-  { id: "5", name: "Emily Blunt", email: "e.blunt@insightflow.com", avatar: "/avatars/emily.png", status: "active", lastActivity: "5 hours ago" },
-];
 
 const PAGE_SIZE = 5;
 
@@ -37,17 +21,90 @@ type ActionType = "suspend" | "reactivate" | "delete";
 
 interface PendingAction {
   type: ActionType;
-  user: OrgUser;
+  user: AdminUser;
+}
+
+/** "2 mins ago" / "3 days ago" / "Never" - no extra dependency needed for this. */
+function formatLastActivity(iso: string | null): string {
+  if (!iso) return "Never";
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const minutes = Math.floor(diffMs / 60_000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} min${minutes === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+function initials(name: string): string {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
 }
 
 export default function UserManagement() {
-  const [users, setUsers] = useState<OrgUser[]>(initialUsers);
+  const navigate = useNavigate();
+
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [total, setTotal] = useState(0);
+  const [stats, setStats] = useState<AdminUserStats | null>(null);
+
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const [actionInFlight, setActionInFlight] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  const loadUsers = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({
+        page: String(page),
+        page_size: String(PAGE_SIZE),
+      });
+      if (query.trim()) params.set("search", query.trim());
+
+      const [listRes, statsRes] = await Promise.all([
+        api.get<AdminUserListResponse>(`/admin/users?${params.toString()}`),
+        api.get<AdminUserStats>("/admin/users/stats"),
+      ]);
+
+      setUsers(listRes.items);
+      setTotal(listRes.total);
+      setStats(statsRes);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 403) {
+        // Not the seeded admin — this screen isn't for them.
+        navigate("/dashboard", { replace: true });
+        return;
+      }
+      setError(err instanceof ApiError ? err.message : "Could not load users. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page, query, navigate]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  // Debounce search so we're not hitting the API on every keystroke.
+  useEffect(() => {
+    const handle = setTimeout(() => setPage(1), 300);
+    return () => clearTimeout(handle);
+  }, [query]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -59,42 +116,19 @@ export default function UserManagement() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        u.status.toLowerCase().includes(q)
-    );
-  }, [query, users]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageUsers = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const totalMembers = users.length;
-  const activeAdmins = users.filter((u) => u.status === "active").length;
-  const suspendedAccounts = users.filter((u) => u.status === "suspended").length;
-
-function toggleSelect(id: string) {
-  setSelected((prev) => {
-    const next = new Set(prev);
-
-    if (next.has(id)) {
-      next.delete(id);
-    } else {
-      next.add(id);
-    }
-
-    return next;
-  });
-}
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   function toggleSelectAll() {
-    setSelected((prev) =>
-      prev.size === pageUsers.length ? new Set() : new Set(pageUsers.map((u) => u.id))
-    );
+    setSelected((prev) => (prev.size === users.length ? new Set() : new Set(users.map((u) => u.id))));
   }
 
   function clearFilters() {
@@ -102,22 +136,31 @@ function toggleSelect(id: string) {
     setPage(1);
   }
 
-  function confirmAction() {
+  async function confirmAction() {
     if (!pendingAction) return;
     const { type, user } = pendingAction;
-
-    if (type === "delete") {
-      setUsers((prev) => prev.filter((u) => u.id !== user.id));
-    } else {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === user.id
-            ? { ...u, status: type === "suspend" ? "suspended" : "active" }
-            : u
-        )
-      );
+    setActionInFlight(true);
+    try {
+      if (type === "delete") {
+        await api.delete(`/admin/users/${user.id}`);
+      } else if (type === "suspend") {
+        await api.post(`/admin/users/${user.id}/suspend`, {});
+      } else {
+        await api.post(`/admin/users/${user.id}/unsuspend`);
+      }
+      setPendingAction(null);
+      setSelected((prev) => {
+        const next = new Set(prev);
+        next.delete(user.id);
+        return next;
+      });
+      await loadUsers();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "That action didn't go through. Please try again.");
+      setPendingAction(null);
+    } finally {
+      setActionInFlight(false);
     }
-    setPendingAction(null);
   }
 
   return (
@@ -131,7 +174,7 @@ function toggleSelect(id: string) {
         <div className="um-stat-card">
           <div className="um-stat-text">
             <span className="um-stat-label">Total Members</span>
-            <span className="um-stat-value">{totalMembers}</span>
+            <span className="um-stat-value">{stats?.total_members ?? "—"}</span>
           </div>
           <div className="um-stat-icon icon-purple">
             <Users size={18} />
@@ -141,7 +184,7 @@ function toggleSelect(id: string) {
         <div className="um-stat-card">
           <div className="um-stat-text">
             <span className="um-stat-label">Active Admins</span>
-            <span className="um-stat-value">{activeAdmins}</span>
+            <span className="um-stat-value">{stats?.active_admins ?? "—"}</span>
           </div>
           <div className="um-stat-icon icon-green">
             <ShieldCheck size={18} />
@@ -151,7 +194,7 @@ function toggleSelect(id: string) {
         <div className="um-stat-card">
           <div className="um-stat-text">
             <span className="um-stat-label">Suspended Accounts</span>
-            <span className="um-stat-value">{suspendedAccounts}</span>
+            <span className="um-stat-value">{stats?.suspended_accounts ?? "—"}</span>
           </div>
           <div className="um-stat-icon icon-amber">
             <Clock3 size={18} />
@@ -164,18 +207,21 @@ function toggleSelect(id: string) {
           <Search size={15} className="um-search-icon" />
           <input
             type="text"
-            placeholder="Search by name, email, or role..."
+            placeholder="Search by name or email..."
             value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(1);
-            }}
+            onChange={(e) => setQuery(e.target.value)}
           />
         </div>
         <button type="button" className="um-clear-filters" onClick={clearFilters}>
           Clear Filters
         </button>
       </div>
+
+      {error && (
+        <div className="um-empty" role="alert" style={{ marginBottom: 12, color: "#b91c1c" }}>
+          {error}
+        </div>
+      )}
 
       <div className="um-table-card">
         <table className="um-table">
@@ -191,7 +237,7 @@ function toggleSelect(id: string) {
               <th className="um-checkbox-col">
                 <input
                   type="checkbox"
-                  checked={pageUsers.length > 0 && selected.size === pageUsers.length}
+                  checked={users.length > 0 && selected.size === users.length}
                   onChange={toggleSelectAll}
                 />
               </th>
@@ -202,88 +248,105 @@ function toggleSelect(id: string) {
             </tr>
           </thead>
           <tbody>
-            {pageUsers.map((user) => (
-              <tr key={user.id}>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={selected.has(user.id)}
-                    onChange={() => toggleSelect(user.id)}
-                  />
-                </td>
-                <td>
-                  <div className="um-user-cell">
-                    <img src={user.avatar} alt={user.name} className="um-avatar" />
-                    <div>
-                      <div className="um-user-name">{user.name}</div>
-                      <div className="um-user-email">{user.email}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="um-center-col">
-                  <span className={`um-status um-status-${user.status}`}>
-                    {user.status === "active" ? "ACTIVE" : "SUSPENDED"}
-                  </span>
-                </td>
-                <td className="um-center-col um-last-activity">{user.lastActivity}</td>
-                <td className="um-actions-col">
-                  <div className="um-row-menu-wrap" ref={openMenuId === user.id ? menuRef : null}>
-                    <button
-                      type="button"
-                      className="um-row-menu"
-                      aria-label="Row actions"
-                      onClick={() =>
-                        setOpenMenuId((prev) => (prev === user.id ? null : user.id))
-                      }
-                    >
-                      <MoreHorizontal size={16} />
-                    </button>
-
-                    {openMenuId === user.id && (
-                      <div className="um-dropdown">
-                        {user.status === "active" ? (
-                          <button
-                            type="button"
-                            className="um-dropdown-item"
-                            onClick={() => {
-                              setPendingAction({ type: "suspend", user });
-                              setOpenMenuId(null);
-                            }}
-                          >
-                            <Ban size={14} />
-                            Suspend
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="um-dropdown-item"
-                            onClick={() => {
-                              setPendingAction({ type: "reactivate", user });
-                              setOpenMenuId(null);
-                            }}
-                          >
-                            <RotateCcw size={14} />
-                            Reactivate
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          className="um-dropdown-item um-dropdown-danger"
-                          onClick={() => {
-                            setPendingAction({ type: "delete", user });
-                            setOpenMenuId(null);
-                          }}
-                        >
-                          <Trash2 size={14} />
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
+            {isLoading && (
+              <tr>
+                <td colSpan={5} className="um-empty">
+                  Loading users...
                 </td>
               </tr>
-            ))}
-            {pageUsers.length === 0 && (
+            )}
+
+            {!isLoading &&
+              users.map((user) => (
+                <tr key={user.id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selected.has(user.id)}
+                      onChange={() => toggleSelect(user.id)}
+                    />
+                  </td>
+                  <td>
+                    <div className="um-user-cell">
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt={user.full_name} className="um-avatar" />
+                      ) : (
+                        <div className="um-avatar" aria-hidden="true" style={{
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          background: "#e5e7eb", fontSize: 12, fontWeight: 600, color: "#4b5563",
+                        }}>
+                          {initials(user.full_name)}
+                        </div>
+                      )}
+                      <div>
+                        <div className="um-user-name">{user.full_name}</div>
+                        <div className="um-user-email">{user.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="um-center-col">
+                    <span className={`um-status um-status-${user.status}`}>
+                      {user.status === "active" ? "ACTIVE" : "SUSPENDED"}
+                    </span>
+                  </td>
+                  <td className="um-center-col um-last-activity">{formatLastActivity(user.last_login)}</td>
+                  <td className="um-actions-col">
+                    <div className="um-row-menu-wrap" ref={openMenuId === user.id ? menuRef : null}>
+                      <button
+                        type="button"
+                        className="um-row-menu"
+                        aria-label="Row actions"
+                        onClick={() => setOpenMenuId((prev) => (prev === user.id ? null : user.id))}
+                      >
+                        <MoreHorizontal size={16} />
+                      </button>
+
+                      {openMenuId === user.id && (
+                        <div className="um-dropdown">
+                          {user.status === "active" ? (
+                            <button
+                              type="button"
+                              className="um-dropdown-item"
+                              onClick={() => {
+                                setPendingAction({ type: "suspend", user });
+                                setOpenMenuId(null);
+                              }}
+                            >
+                              <Ban size={14} />
+                              Suspend
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="um-dropdown-item"
+                              onClick={() => {
+                                setPendingAction({ type: "reactivate", user });
+                                setOpenMenuId(null);
+                              }}
+                            >
+                              <RotateCcw size={14} />
+                              Reactivate
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            className="um-dropdown-item um-dropdown-danger"
+                            onClick={() => {
+                              setPendingAction({ type: "delete", user });
+                              setOpenMenuId(null);
+                            }}
+                          >
+                            <Trash2 size={14} />
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+            {!isLoading && users.length === 0 && (
               <tr>
                 <td colSpan={5} className="um-empty">
                   No users match your search.
@@ -295,25 +358,16 @@ function toggleSelect(id: string) {
 
         <div className="um-pagination">
           <span className="um-pagination-summary">
-            Showing <strong>{pageUsers.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}-
-            {(page - 1) * PAGE_SIZE + pageUsers.length}</strong> of{" "}
-            <strong>{filtered.length}</strong> users
+            Showing <strong>{users.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}-
+            {(page - 1) * PAGE_SIZE + users.length}</strong> of{" "}
+            <strong>{total}</strong> users
           </span>
           <div className="um-pagination-controls">
-            <button
-              type="button"
-              disabled={page === 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-            >
+            <button type="button" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
               ‹
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-              <button
-                key={n}
-                type="button"
-                className={n === page ? "active" : ""}
-                onClick={() => setPage(n)}
-              >
+              <button key={n} type="button" className={n === page ? "active" : ""} onClick={() => setPage(n)}>
                 {n}
               </button>
             ))}
@@ -331,6 +385,7 @@ function toggleSelect(id: string) {
       {pendingAction && (
         <ConfirmModal
           action={pendingAction}
+          busy={actionInFlight}
           onCancel={() => setPendingAction(null)}
           onConfirm={confirmAction}
         />
@@ -341,17 +396,18 @@ function toggleSelect(id: string) {
 
 interface ConfirmModalProps {
   action: PendingAction;
+  busy: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }
 
-function ConfirmModal({ action, onCancel, onConfirm }: ConfirmModalProps) {
+function ConfirmModal({ action, busy, onCancel, onConfirm }: ConfirmModalProps) {
   const { type, user } = action;
 
   const copy = {
     suspend: {
       title: "Suspend account",
-      description: `${user.name} will lose access immediately and will be marked as suspended until reactivated.`,
+      description: `${user.full_name} will lose access immediately and will be marked as suspended until reactivated.`,
       icon: <Ban size={20} />,
       iconClass: "um-modal-icon-amber",
       confirmLabel: "Suspend",
@@ -359,7 +415,7 @@ function ConfirmModal({ action, onCancel, onConfirm }: ConfirmModalProps) {
     },
     reactivate: {
       title: "Reactivate account",
-      description: `${user.name} will regain full access and be marked as active again.`,
+      description: `${user.full_name} will regain full access and be marked as active again.`,
       icon: <RotateCcw size={20} />,
       iconClass: "um-modal-icon-green",
       confirmLabel: "Reactivate",
@@ -367,7 +423,7 @@ function ConfirmModal({ action, onCancel, onConfirm }: ConfirmModalProps) {
     },
     delete: {
       title: "Delete account",
-      description: `This will permanently remove ${user.name} from your organization. This action cannot be undone.`,
+      description: `This will remove ${user.full_name} from your organization. This action cannot be undone.`,
       icon: <Trash2 size={20} />,
       iconClass: "um-modal-icon-red",
       confirmLabel: "Delete",
@@ -376,9 +432,9 @@ function ConfirmModal({ action, onCancel, onConfirm }: ConfirmModalProps) {
   }[type];
 
   return (
-    <div className="um-modal-overlay" onClick={onCancel}>
+    <div className="um-modal-overlay" onClick={busy ? undefined : onCancel}>
       <div className="um-modal" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="um-modal-close" onClick={onCancel} aria-label="Close">
+        <button type="button" className="um-modal-close" onClick={onCancel} aria-label="Close" disabled={busy}>
           <X size={16} />
         </button>
 
@@ -388,11 +444,11 @@ function ConfirmModal({ action, onCancel, onConfirm }: ConfirmModalProps) {
         <p className="um-modal-description">{copy.description}</p>
 
         <div className="um-modal-actions">
-          <button type="button" className="um-btn-secondary" onClick={onCancel}>
+          <button type="button" className="um-btn-secondary" onClick={onCancel} disabled={busy}>
             Cancel
           </button>
-          <button type="button" className={copy.confirmClass} onClick={onConfirm}>
-            {copy.confirmLabel}
+          <button type="button" className={copy.confirmClass} onClick={onConfirm} disabled={busy}>
+            {busy ? "Working..." : copy.confirmLabel}
           </button>
         </div>
       </div>

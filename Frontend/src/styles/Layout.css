@@ -1,7 +1,7 @@
 .app-layout {
   display: flex;
   min-height: 100vh;
-  background: #F8F9FA;
+  background: var(--bg-secondary);
   font-family: 'Poppins', sans-serif;
 }
 
@@ -16,6 +16,6 @@
 .app-content {
   flex: 1;
   padding: 20px 32px 28px;
-  background: #F8F9FA;
+  background: var(--bg-secondary);
   overflow-y: auto;
 }

@@ -48,7 +48,7 @@ export default function ForgotPassword() {
     setLoading(true);
     try {
       await requestPasswordReset({ email });
-      navigate("/verify-otp", { state: { email } });
+      navigate("/verify-email-code", { state: { email } });
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {

@@ -1,9 +1,15 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Lock, Eye, EyeOff } from "lucide-react";
+import { resetPassword } from "../services/authService";
 import logo from "../assets/logo.png";
 import "../styles/ResetPassword.css";
+
+interface LocationState {
+  email?: string;
+  resetToken?: string;
+}
 
 interface Requirement {
   label: string;
@@ -29,6 +35,9 @@ function getStrength(password: string): { label: string; level: number; color: s
 
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as LocationState | null;
+  const resetToken = state?.resetToken;
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -51,6 +60,14 @@ export default function ResetPassword() {
   const confirmError =
     confirmTouched && confirmPassword !== password ? "Passwords do not match." : "";
 
+  // If someone lands here directly without a reset_token (refresh, back
+  // button after the token's already been used, bookmarked URL), there's
+  // nothing to reset against - send them back to start the flow over.
+  if (!resetToken) {
+    navigate("/forgot-password", { replace: true });
+    return null;
+  }
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitError("");
@@ -63,7 +80,11 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      // TODO: call resetPassword service once backend endpoint is wired
+      await resetPassword({
+        resetToken: resetToken as string,
+        newPassword: password,
+        confirmPassword: confirmPassword,
+       });
       navigate("/reset-password-success");
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");

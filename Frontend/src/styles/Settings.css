@@ -14,13 +14,13 @@
 .settings-header h1 {
   font-size: 22px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 
 .settings-header p {
   font-size: 13px;
-  color: #64748B;
+  color: var(--text-secondary);
 }
 
 .settings-save-btn {
@@ -49,7 +49,7 @@
 }
 
 .settings-tabs {
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid var(--border-color);
   margin-bottom: 20px;
   padding-bottom: 12px;
 }
@@ -58,13 +58,13 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: #fff;
-  border: 1px solid #E2E8F0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 8px 14px;
   font-size: 12.5px;
   font-weight: 500;
-  color: #0F172A;
+  color: var(--text-primary);
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
 }
@@ -75,8 +75,8 @@
 }
 
 .settings-card {
-  background: #fff;
-  border: 1px solid #E2E8F0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 20px 22px;
   margin-bottom: 16px;
@@ -85,7 +85,7 @@
 .settings-card h2 {
   font-size: 16px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 
@@ -96,7 +96,7 @@
 .settings-card-subtitle {
   display: block;
   font-size: 12px;
-  color: #94A3B8;
+  color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
@@ -105,7 +105,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 0;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .settings-row.no-border {
@@ -115,7 +115,7 @@
 .settings-row-label {
   font-size: 13px;
   font-weight: 500;
-  color: #0F172A;
+  color: var(--text-primary);
 }
 
 .settings-toggle {
@@ -155,11 +155,11 @@
   text-align: left;
   background: none;
   border: none;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--border-color);
   padding: 14px 0;
   font-size: 13px;
   font-weight: 500;
-  color: #0F172A;
+  color: var(--text-primary);
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
 }

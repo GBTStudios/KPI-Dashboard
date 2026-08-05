@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import type { ClipboardEvent, KeyboardEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { verifyEmail, resendVerificationEmail } from "../services/authService";
+import { verifyResetCode, requestPasswordReset } from "../services/authService";
 import logo from "../assets/logo2.png";
 import "../styles/VerifyEmailCode.css";
 
@@ -68,13 +68,19 @@ export default function VerifyEmailCode() {
   }
 
   async function handleVerify(code: string) {
+    if (!email) {
+      setError("We don't have your email on this screen. Please start over.");
+      return;
+    }
     setVerifying(true);
     setError("");
     try {
-      await verifyEmail({ token: code });
-      navigate("/login");
+      const { reset_token } = await verifyResetCode({ email, code });
+      navigate("/reset-password", { state: { email, resetToken: reset_token } });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid or expired code. Please try again.");
+      setDigits(Array(CODE_LENGTH).fill(""));
+      inputRefs.current[0]?.focus();
     } finally {
       setVerifying(false);
     }
@@ -89,7 +95,7 @@ export default function VerifyEmailCode() {
     setResendMessage("");
     setError("");
     try {
-      await resendVerificationEmail({ email });
+      await requestPasswordReset({ email });
       setResendMessage("A new code has been sent.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not resend code. Try again.");
@@ -104,8 +110,8 @@ export default function VerifyEmailCode() {
         <img src={logo} alt="Groundbreaker Talents logo" className="vc-logo" />
         <p className="vc-brand">Groundbreaker Talents</p>
 
-        <h2 className="vc-title">Verify Email</h2>
-        <p className="vc-subtitle">We've sent a 6-digit verification code to</p>
+        <h2 className="vc-title">Verify Reset Code</h2>
+        <p className="vc-subtitle">We've sent a 6-digit code to</p>
         {email && <p className="vc-email">{maskEmail(email)}</p>}
 
         <p className="vc-code-label">Enter code</p>

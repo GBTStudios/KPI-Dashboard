@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { login } from "../services/authService";
+import { login, googleAuth, storeAuthTokens } from "../services/authService";
 import logo from "../assets/logo.png";
 import "../styles/Login.css";
 
@@ -35,8 +35,66 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // CHANGED: was `googleInitialized` (a boolean ref for the old One Tap
+  // flow). Now holds the initialized OAuth2 code client itself, so the
+  // button's onClick can call `.requestCode()` on it directly.
+  const googleClientRef = useRef<{ requestCode: () => void } | null>(null);
+
+  // Load Google Identity Services SDK once on mount, then initialize the
+  // OAuth2 popup code client with our client ID. prompt: "select_account"
+  // forces Google's account chooser every time - this is what the old
+  // `accounts.id` One Tap flow couldn't do.
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (!window.google) return;
+      googleClientRef.current = window.google.accounts.oauth2.initCodeClient({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        scope: "openid email profile",
+        ux_mode: "popup",
+        prompt: "select_account",
+        callback: handleGoogleCodeResponse,
+      });
+    };
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function handleGoogleCodeResponse(response: { code: string }) {
+    setGoogleLoading(true);
+    setSubmitError("");
+    try {
+      // "Continue with Google" on Login always uses remember_me: true -
+      // matches the expectation that a returning user via Google shouldn't
+      // need to re-auth constantly. Adjust if you'd rather this respect a
+      // separate UI toggle instead.
+      const data = await googleAuth({ code: response.code, rememberMe: true });
+      storeAuthTokens(data.tokens);
+      navigate("/dashboard");
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Google sign-in failed. Please try again.");
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
+  function handleGoogleLogin() {
+    if (!googleClientRef.current) {
+      setSubmitError("Google Sign-In is still loading. Please try again in a moment.");
+      return;
+    }
+    googleClientRef.current.requestCode();
+  }
 
   function validateField(field: keyof FieldErrors, values = { email, password }) {
     switch (field) {
@@ -83,9 +141,8 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const data = await login({ email, password });
-localStorage.setItem("authToken", data.tokens.access_token);
-localStorage.setItem("refreshToken", data.tokens.refresh_token);
+      const data = await login({ email, password, rememberMe });
+      storeAuthTokens(data.tokens);
       navigate("/dashboard");
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Login failed. Please try again.");
@@ -177,8 +234,13 @@ localStorage.setItem("refreshToken", data.tokens.refresh_token);
                 <span>OR</span>
               </div>
 
-              <button type="button" className="btn-google">
-                <GoogleIcon /> Continue with Google
+              <button
+                type="button"
+                className="btn-google"
+                onClick={handleGoogleLogin}
+                disabled={googleLoading}
+              >
+                <GoogleIcon /> {googleLoading ? "Signing in..." : "Continue with Google"}
               </button>
             </form>
 

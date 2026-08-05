@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { signUp } from "../services/authService";
+import { signUp, googleAuth, storeAuthTokens } from "../services/authService";
 import logo from "../assets/logo.png";
 import "../styles/SignUp.css";
 
@@ -41,8 +41,62 @@ export default function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // CHANGED: was `googleInitialized` (a boolean ref for the old One Tap
+  // flow). Now holds the initialized OAuth2 code client itself, so the
+  // button's onClick can call `.requestCode()` on it directly.
+  const googleClientRef = useRef<{ requestCode: () => void } | null>(null);
+
+  // Load Google Identity Services SDK once on mount, then initialize the
+  // OAuth2 popup code client with our client ID. prompt: "select_account"
+  // forces Google's account chooser every time - this is what the old
+  // `accounts.id` One Tap flow couldn't do.
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (!window.google) return;
+      googleClientRef.current = window.google.accounts.oauth2.initCodeClient({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        scope: "openid email profile",
+        ux_mode: "popup",
+        prompt: "select_account",
+        callback: handleGoogleCodeResponse,
+      });
+    };
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function handleGoogleCodeResponse(response: { code: string }) {
+    setGoogleLoading(true);
+    setSubmitError("");
+    try {
+      const data = await googleAuth({ code: response.code, rememberMe: false });
+      storeAuthTokens(data.tokens);
+      navigate("/dashboard");
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Google sign-up failed. Please try again.");
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
+  function handleGoogleSignUp() {
+    if (!googleClientRef.current) {
+      setSubmitError("Google Sign-In is still loading. Please try again in a moment.");
+      return;
+    }
+    googleClientRef.current.requestCode();
+  }
 
   function validateField(field: keyof FieldErrors, values = { fullName, email, password, confirmPassword, agreed }) {
     switch (field) {
@@ -108,17 +162,12 @@ export default function SignUp() {
     setLoading(true);
     try {
       await signUp({ fullName, email, password, confirmPassword });
-      navigate("/verify-email");
+      navigate("/verify-email", { state: { email } });
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Sign up failed. Please try again.");
     } finally {
       setLoading(false);
     }
-  }
-
-  function handleGoogleSignUp() {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    window.location.href = `${apiBaseUrl}/auth/google`;
   }
 
   return (
@@ -273,8 +322,9 @@ export default function SignUp() {
                   type="button"
                   className="btn-google"
                   onClick={handleGoogleSignUp}
+                  disabled={googleLoading}
                 >
-                  <GoogleIcon /> Sign up with Google
+                  <GoogleIcon /> {googleLoading ? "Signing up..." : "Sign up with Google"}
                 </button>
               </div>
             </form>
