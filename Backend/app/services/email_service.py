@@ -1,12 +1,13 @@
 """Email delivery via SendGrid.
 
 Single seam for all outbound transactional email (verification, password
-reset). Failures are logged, never raised to the caller - a SendGrid outage
-or missing API key should never break a signup/login/forgot-password
-response.
+reset, account status changes). Failures are logged, never raised to the
+caller - a SendGrid outage or missing API key should never break a
+signup/login/forgot-password/admin-action response.
 
-If SENDGRID_API_KEY isn't set, this falls back to logging the link instead
-of sending - so local development works without a real SendGrid account.
+If SENDGRID_API_KEY isn't set, this falls back to logging the link/code
+instead of sending - so local development works without a real SendGrid
+account.
 """
 import logging
 
@@ -95,4 +96,58 @@ def send_password_reset_code_email(to_email: str, full_name: str, code: str) -> 
     sent = _send(to_email, subject, html)
     if not sent:
         logger.warning("Reset code email NOT delivered - code for manual testing: %s (email=%s)", code, to_email)
+    return sent
+
+
+def _account_status_html(heading: str, body_line: str, color: str = "#0f5c4c") -> str:
+    """Shared shell for the short, one-line account-status emails
+    (suspended / deleted / reactivated) so they stay visually consistent
+    with the rest of the transactional emails without repeating markup."""
+    return f"""
+    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2 style="color: {color};">{heading}</h2>
+      <p>{body_line}</p>
+      <p style="color:#666;font-size:13px;">
+        If you believe this was a mistake, please contact support.
+      </p>
+    </div>
+    """
+
+
+def send_account_suspended_email(to_email: str, full_name: str, reason: str | None = None) -> bool:
+    subject = "Your account has been suspended"
+    reason_line = f" Reason: {reason}" if reason else ""
+    html = _account_status_html(
+        "Account suspended",
+        f"Hi {full_name}, your GroundPulse account has been suspended.{reason_line}",
+        color="#b91c1c",
+    )
+    sent = _send(to_email, subject, html)
+    if not sent:
+        logger.warning("Suspension email NOT delivered (email=%s)", to_email)
+    return sent
+
+
+def send_account_deleted_email(to_email: str, full_name: str) -> bool:
+    subject = "Your account has been deleted"
+    html = _account_status_html(
+        "Account deleted",
+        f"Hi {full_name}, your GroundPulse account has been deleted.",
+        color="#b91c1c",
+    )
+    sent = _send(to_email, subject, html)
+    if not sent:
+        logger.warning("Deletion email NOT delivered (email=%s)", to_email)
+    return sent
+
+
+def send_account_reactivated_email(to_email: str, full_name: str) -> bool:
+    subject = "Your account has been reactivated"
+    html = _account_status_html(
+        "Account reactivated",
+        f"Hi {full_name}, your GroundPulse account has been reactivated. You can log in as usual.",
+    )
+    sent = _send(to_email, subject, html)
+    if not sent:
+        logger.warning("Reactivation email NOT delivered (email=%s)", to_email)
     return sent

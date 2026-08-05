@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     ENVIRONMENT: str = "development"
+    ADMIN_EMAIL: str = "mariamirembe43@gmail.com"
+    ADMIN_NAME: str = "System Administrator"
+    ADMIN_INITIAL_PASSWORD: str = "ChangeThisStrongP@ss1!"
+
 
     DATABASE_URL: str
 
@@ -24,19 +28,20 @@ class Settings(BaseSettings):
     PASSWORD_RESET_OTP_EXPIRE_MINUTES: int = 10
     PASSWORD_RESET_TOKEN_EXPIRE_MINUTES: int = 15  # stage-2 token, after code is verified
     MAX_RESET_CODE_ATTEMPTS: int = 5
-    FRONTEND_RESET_PASSWORD_URL: str = "http://localhost:3000/reset-password"
+    FRONTEND_RESET_PASSWORD_URL: str = "http://localhost:5173/reset-password"
 
-    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_ID: str 
+    GOOGLE_CLIENT_SECRET: str
 
     # ---- SendGrid (transactional email: verification + password reset) ----
-    SENDGRID_API_KEY: str = ""
+    SENDGRID_API_KEY: str
     SENDGRID_FROM_EMAIL: str = "no-reply@groundbreakerstudio.com"
-    SENDGRID_FROM_NAME: str = "GroundPulse"
+    SENDGRID_FROM_NAME: str = "norepy"
 
     # ---- Email verification ----
-    EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES: int = 30  # 24 hours
-    BACKEND_BASE_URL: str = "http://localhost:8000"
-    FRONTEND_LOGIN_URL: str = "http://localhost:5173/login"
+    EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES: int = 30
+    BACKEND_BASE_URL: str
+    FRONTEND_LOGIN_URL: str
     CORS_ORIGINS: str = "*"
     TRUSTED_HOSTS: str = "*"
 

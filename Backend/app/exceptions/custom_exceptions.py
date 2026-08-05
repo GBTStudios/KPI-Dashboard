@@ -165,10 +165,55 @@ class ResetCodeLockedException(AppException):
 
     def __init__(self):
         super().__init__("Too many incorrect attempts. Please request a new code.")
-        
+
 class PasswordResetTokenInvalidException(AppException):
     status_code = status.HTTP_400_BAD_REQUEST
     error_code = "RESET_TOKEN_INVALID"
 
     def __init__(self):
         super().__init__("This password reset link is invalid or has expired.")
+class AccountSuspendedException(AppException):
+    status_code = status.HTTP_403_FORBIDDEN
+    error_code = "ACCOUNT_SUSPENDED"
+
+    def __init__(self, reason: str | None = None):
+        message = "This account has been suspended." + (f" Reason: {reason}" if reason else "")
+        super().__init__(message)
+
+
+class InsufficientRoleException(AppException):
+    status_code = status.HTTP_403_FORBIDDEN
+    error_code = "INSUFFICIENT_ROLE"
+
+    def __init__(self, message: str = "You do not have permission to perform this action."):
+        super().__init__(message)
+
+
+class InvalidRoleException(AppException):
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    error_code = "INVALID_ROLE"
+
+    def __init__(self, message: str = "Invalid role specified."):
+        super().__init__(message)
+class UserNotFoundException(AppException):
+    status_code = status.HTTP_404_NOT_FOUND
+    error_code = "USER_NOT_FOUND"
+
+    def __init__(self):
+        super().__init__("User not found.")
+
+
+class CannotModifySelfException(AppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    error_code = "CANNOT_MODIFY_SELF"
+
+    def __init__(self):
+        super().__init__("You cannot perform this action on your own account.")
+
+
+class IncorrectPasswordException(AppException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    error_code = "INCORRECT_PASSWORD"
+
+    def __init__(self):
+        super().__init__("Current password is incorrect.")

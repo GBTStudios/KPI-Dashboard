@@ -46,7 +46,7 @@ from app.repositories.refresh_token_repository import RefreshTokenRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.auth import TokenPair
 from app.services import email_service
-from app.services.google_oauth import verify_google_id_token
+from app.services.google_oauth import exchange_auth_code_for_id_token, verify_google_id_token
 
 logger = logging.getLogger("groundpulse")
 
@@ -163,7 +163,11 @@ class AuthService:
     # ------------------------------------------------------------------
     # GOOGLE SIGN-IN / SIGN-UP  ("Continue with Google" / "Sign up with Google")
     # ------------------------------------------------------------------
-    async def google_auth(self, raw_id_token: str, remember_me: bool) -> tuple[User, TokenPair, bool]:
+    async def google_auth(self, auth_code: str, remember_me: bool) -> tuple[User, TokenPair, bool]:
+        """Takes the OAuth2 authorization `code` from the frontend's popup
+        code-flow (prompt: 'select_account') - exchanges it for an id_token,
+        then verifies it exactly as before."""
+        raw_id_token = await exchange_auth_code_for_id_token(auth_code)
         profile = verify_google_id_token(raw_id_token)
 
         user = await self.users.get_by_oauth("google", profile.sub)

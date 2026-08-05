@@ -43,14 +43,20 @@ class LoginRequest(BaseModel):
 
 
 class GoogleAuthRequest(BaseModel):
-    """Frontend obtains this id_token via Google Identity Services
-    (google.accounts.id.initialize / One Tap / the 'Sign up with Google' button)
-    and POSTs it here. The backend verifies it server-side against Google's
-    public keys - the frontend never talks to our backend with anything but
-    this signed token, and we never trust a Google profile handed to us
-    without verifying the signature ourselves.
+    """Frontend obtains this authorization `code` via Google Identity
+    Services' OAuth2 popup code flow (google.accounts.oauth2.initCodeClient,
+    ux_mode: 'popup', prompt: 'select_account') and POSTs it here.
+
+    CHANGED from the old id_token/One Tap flow: One Tap has no way to force
+    Google's account chooser (it silently reuses whatever Google account is
+    already active in the browser). The OAuth2 code flow supports
+    prompt: 'select_account', which does force it - the tradeoff is the
+    frontend now gets a `code` instead of an `id_token`, so the backend
+    exchanges that code for the id_token itself server-side (needs
+    GOOGLE_CLIENT_SECRET - see google_oauth.py:exchange_auth_code_for_id_token)
+    before doing the same signature verification as before.
     """
-    id_token: str
+    code: str
     remember_me: bool = False
 
 

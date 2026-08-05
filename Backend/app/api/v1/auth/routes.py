@@ -85,12 +85,19 @@ async def login(payload: LoginRequest, request: Request, db: AsyncSession = Depe
     "/google",
     response_model=SuccessResponse[AuthResponseData],
     summary="Continue with Google / Sign up with Google",
-    responses={401: {"description": "Invalid Google token"}},
+    description=(
+        "CHANGED: takes an OAuth2 authorization `code` from the frontend's "
+        "popup code flow (google.accounts.oauth2.initCodeClient, "
+        "prompt: 'select_account'), not a raw id_token - this is what lets "
+        "the frontend force Google's account chooser every time instead of "
+        "silently reusing whatever Google account is active in the browser."
+    ),
+    responses={401: {"description": "Invalid or expired Google authorization code"}},
 )
 async def google_auth(payload: GoogleAuthRequest, request: Request, db: AsyncSession = Depends(get_db)):
     enforce_rate_limit(f"google:{get_client_ip(request)}", max_attempts=20, window_seconds=60)
     service = _service(db, request)
-    user, tokens, is_new = await service.google_auth(payload.id_token, payload.remember_me)
+    user, tokens, is_new = await service.google_auth(payload.code, payload.remember_me)
     return SuccessResponse(
         message="Account created via Google." if is_new else "Login successful.",
         data=AuthResponseData(user=UserOut.model_validate(user), tokens=tokens),
