@@ -217,3 +217,11 @@ class IncorrectPasswordException(AppException):
 
     def __init__(self):
         super().__init__("Current password is incorrect.")
+
+
+class KpiIndicatorNotFoundException(AppException):
+    status_code = status.HTTP_404_NOT_FOUND
+    error_code = "KPI_INDICATOR_NOT_FOUND"
+
+    def __init__(self):
+        super().__init__("KPI indicator not found.")

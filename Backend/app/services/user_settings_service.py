@@ -12,7 +12,7 @@ from fastapi import UploadFile, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_password, validate_password_strength, verify_password
-from app.exceptions.custom_exceptions import IncorrectPasswordException
+from app.exceptions.custom_exceptions import IncorrectPasswordException, WeakPasswordException
 from app.models.user import User
 from app.repositories.audit_log_repository import AuditLogRepository
 from app.repositories.refresh_token_repository import RefreshTokenRepository
@@ -63,7 +63,6 @@ class UserSettingsService:
         logger.info("Settings updated user_id=%s", self.user.id)
         return await self.get_settings(user_id)
 
-    # ✅ ADD THIS METHOD - Upload avatar
     async def upload_avatar(self, user_id: uuid.UUID, file: UploadFile) -> str:
         """Upload and save avatar image."""
         # Create uploads directory if it doesn't exist
@@ -126,19 +125,41 @@ class UserSettingsService:
         )
 
     async def change_password(self, current_password: str, new_password: str) -> None:
+        """Change user password."""
+        # 1. Verify current password
         if self.user.password_hash is None or not verify_password(current_password, self.user.password_hash):
             self.audit.add(
                 "PASSWORD_CHANGE_FAILED", user_id=self.user.id, description="Incorrect current password",
                 ip_address=self.ip_address, user_agent=self.user_agent,
             )
+            await self.db.commit()  # ✅ Commit the audit log
             raise IncorrectPasswordException()
 
-        validate_password_strength(new_password)
+        # 2. Validate new password strength
+        try:
+            validate_password_strength(new_password)
+        except WeakPasswordException as e:
+            self.audit.add(
+                "PASSWORD_CHANGE_FAILED", user_id=self.user.id,
+                description=f"Weak password: {str(e)}",
+                ip_address=self.ip_address, user_agent=self.user_agent,
+            )
+            await self.db.commit()  # ✅ Commit the audit log
+            raise
+
+        # 3. Hash and set new password
         self.user.password_hash = hash_password(new_password)
+
+        # 4. Revoke all existing refresh tokens (force re-login on all devices)
         await self.refresh_tokens.revoke_all_for_user(self.user.id)
 
+        # 5. Log the successful change
         self.audit.add(
             "PASSWORD_CHANGED", user_id=self.user.id, description="Password changed via Settings",
             ip_address=self.ip_address, user_agent=self.user_agent,
         )
+
+        # ✅ CRITICAL: Commit all changes to the database!
+        await self.db.commit()
+
         logger.info("Password changed user_id=%s", self.user.id)

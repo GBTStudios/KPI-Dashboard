@@ -15,6 +15,7 @@ from app.api.v1.auth.routes import router as auth_router
 from app.api.v1.health.routes import router as health_router
 from app.api.v1.users.routes import router as users_router
 from app.api.v1.users.settings_routes import router as settings_router
+from app.api.v1.kpis.routes import router as kpis_router
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.exceptions.handlers import register_exception_handlers
@@ -75,3 +76,4 @@ app.include_router(health_router, prefix=settings.API_V1_PREFIX)
 app.include_router(admin_users_router, prefix=settings.API_V1_PREFIX)
 app.include_router(users_router, prefix=settings.API_V1_PREFIX)
 app.include_router(settings_router, prefix=settings.API_V1_PREFIX)
+app.include_router(kpis_router, prefix=settings.API_V1_PREFIX)
