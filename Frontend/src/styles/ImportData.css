@@ -1,0 +1,414 @@
+:root {
+  --color-primary: #1c5e59;
+  --color-blue: #5575f2;
+  --color-purple: #df92eb;
+  --color-bg-tint: #daefee;
+
+  --color-bg-page: #f4f5f7;
+  --color-card-bg: #ffffff;
+  --color-border: #e5e7eb;
+  --color-text-main: #1a1a1a;
+  --color-text-muted: #6b7280;
+
+  --color-success: #1c5e59;
+  --color-success-bg: #e5f3f1;
+  --color-danger: #d92d2d;
+  --color-danger-bg: #fdeaea;
+
+  --radius-card: 12px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* --------------------------------------------------------------
+   Page wrapper
+   --------------------------------------------------------------
+   Self-contained on purpose: doesn't assume Layout.css gives us
+   flex:1/width:100% already, so this page can't get squeezed the
+   way the Dashboard table did.
+   -------------------------------------------------------------- */
+.import-data-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  color: var(--color-text-main);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* --------------------------------------------------------------
+   Page heading
+   -------------------------------------------------------------- */
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 0;
+  max-width: 640px;
+  line-height: 1.5;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 14px 0;
+}
+
+/* --------------------------------------------------------------
+   How it works — step indicator
+   -------------------------------------------------------------- */
+.import-steps {
+  display: flex;
+  align-items: center;
+}
+
+.import-step-group {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.import-step-group:last-child {
+  flex: 0 0 auto;
+}
+
+.import-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.import-step-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.import-step-circle.active {
+  background: var(--color-blue);
+  color: #ffffff;
+}
+
+.import-step-circle.complete {
+  background: var(--color-success);
+  color: #ffffff;
+}
+
+.import-step-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.import-step-label.active {
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+
+.import-step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+  margin: 0 12px;
+  min-width: 20px;
+}
+
+@media (max-width: 700px) {
+  .import-steps {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .import-step-line {
+    min-width: 30px;
+  }
+}
+
+/* --------------------------------------------------------------
+   File Upload area
+   -------------------------------------------------------------- */
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.upload-area {
+  background: var(--color-card-bg);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.upload-area.drag-active {
+  border-color: var(--color-blue);
+  background: #f5f7ff;
+}
+
+.upload-icon-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #eef1fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.upload-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.upload-subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 20px;
+}
+
+.upload-select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-blue);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.upload-select-btn:hover {
+  opacity: 0.92;
+}
+
+.upload-select-plus {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.upload-hidden-input {
+  display: none;
+}
+
+/* Selected file state */
+.upload-selected-file {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.upload-selected-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  flex: 1;
+}
+
+.upload-selected-label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.upload-selected-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.upload-selected-size {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.upload-remove-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+}
+
+.upload-remove-btn:hover {
+  background: var(--color-bg-page);
+  color: var(--color-danger);
+}
+
+.upload-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+}
+
+/* --------------------------------------------------------------
+   Security banner
+   -------------------------------------------------------------- */
+.security-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--color-bg-tint);
+  border-radius: var(--radius-card);
+  padding: 14px 18px;
+}
+
+.security-banner-icon {
+  color: var(--color-primary);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.security-banner-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 2px;
+}
+
+.security-banner-text {
+  font-size: 12px;
+  color: var(--color-primary);
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------
+   Last Import row
+   -------------------------------------------------------------- */
+.last-import {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--color-card-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 16px 20px;
+}
+
+.last-import-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.last-import-label {
+  color: var(--color-text-main);
+}
+
+.last-import-name {
+  font-weight: 700;
+}
+
+.last-import-synced {
+  color: var(--color-text-muted);
+}
+
+.last-import-status {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.last-import-link {
+  font-size: 13px;
+  color: var(--color-text-main);
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.last-import-link:hover {
+  color: var(--color-blue);
+}
+
+@media (max-width: 600px) {
+  .last-import {
+    flex-wrap: wrap;
+  }
+}
+
+/* --------------------------------------------------------------
+   Expected Columns
+   -------------------------------------------------------------- */
+.expected-columns-card {
+  background: var(--color-card-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+.expected-columns-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.expected-columns-subtitle {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.expected-columns-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.expected-column-pill {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  background: var(--color-card-bg);
+}
+
+@media (max-width: 500px) {
+  .expected-column-pill {
+    flex: 1 1 calc(50% - 12px);
+    text-align: center;
+  }
+}
