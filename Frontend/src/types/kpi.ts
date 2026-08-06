@@ -5,6 +5,7 @@ export interface KpiIndicator {
   indicator: string;
   personInCharge: string;
   annualTarget: number;
+  year: number; // reporting year this row's monthly data belongs to - see kpiService.ts
   monthlyTarget: number[]; // 12 values, Jan–Dec
   monthlyActual: (number | null)[]; // 12 values, Jan–Dec
 }

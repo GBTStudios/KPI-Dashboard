@@ -503,3 +503,13 @@ thead .kpi-sticky {
   outline: none;
   border-color: #4F46E5;
 }
+
+/* Added: keeps Cancel + Add grouped as one unit inside .kpi-entry-filters,
+   so they wrap together (or stay on the row together) instead of Add
+   splitting onto its own line below Cancel when the filter row overflows. */
+.kpi-entry-filter-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}

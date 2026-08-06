@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Save,
   Send,
@@ -11,9 +12,10 @@ import {
   PlusCircle,
   History,
 } from "lucide-react";
-import { mockKpiIndicators } from "../data/mockKpiData";
 import { MONTHS, getEndOfYearActual, getEndOfYearTarget } from "../types/kpi";
 import type { KpiIndicator } from "../types/kpi";
+import { listKpis, deleteKpi, saveIndicatorRow } from "../services/kpiService";
+import { ApiError } from "../services/api";
 import "../styles/KpiEntry.css";
 import "../styles/KpiUpdate.css";
 
@@ -44,42 +46,77 @@ const PARAMETERS = [
   "Guestspeakers",
 ];
 const PEOPLE = ["Amara Whitfield", "John Doe", "Mary Precious"];
+// "Reporting year" has no backend equivalent yet - see kpiService.ts's
+// top-of-file note. Kept as a client-only field for now.
 const YEARS = ["2024", "2025", "2026"];
 
 export default function KpiUpdate() {
+  const navigate = useNavigate();
   const [department, setDepartment] = useState("all");
   const [parameter, setParameter] = useState("all");
   const [person, setPerson] = useState("all");
   const [year, setYear] = useState("2026");
   const [search, setSearch] = useState("");
-  const [indicators, setIndicators] =
-    useState<KpiIndicator[]>(mockKpiIndicators);
-  const [originalIndicators] = useState<KpiIndicator[]>(mockKpiIndicators);
+  const [indicators, setIndicators] = useState<KpiIndicator[]>([]);
   const [modifiedIds, setModifiedIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [rowFilter, setRowFilter] = useState<"all" | "modified">("all");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // loadIndicators is called both from the effect below (on filter/year
+  // change) and directly from handleDiscardChanges - a request counter
+  // guards both call sites the same way: if a newer call has started by
+  // the time an older one resolves, the older result is discarded.
+  // Without this, switching years quickly (each request took ~3s in
+  // testing) could let a slow, stale response for a previous year
+  // overwrite the correct result for whatever year is now selected.
+  const loadRequestId = useRef(0);
+
+  // department/parameter/year are sent to the backend as real filters
+  // (year defaults server-side to the current year if omitted, but we
+  // always send the dropdown's value explicitly so switching years
+  // actually changes what loads); person/search/rowFilter stay
+  // client-side - list_kpis has no person_in_charge or free-text-
+  // across-fields filter.
+  async function loadIndicators() {
+    const requestId = ++loadRequestId.current;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { items } = await listKpis({
+        department: department === "all" ? undefined : department,
+        parameter: parameter === "all" ? undefined : parameter,
+        year: Number(year),
+      });
+      if (requestId !== loadRequestId.current) return; // a newer request has since started
+      setIndicators(items);
+      setModifiedIds(new Set());
+    } catch (err) {
+      if (requestId !== loadRequestId.current) return;
+      setError(err instanceof ApiError ? err.message : "Could not load KPI data.");
+    } finally {
+      if (requestId === loadRequestId.current) setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadIndicators();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [department, parameter, year]);
+
   const filtered = useMemo(() => {
     return indicators.filter((row) => {
-      if (department !== "all" && row.department !== department) return false;
-      if (parameter !== "all" && row.parameter !== parameter) return false;
       if (person !== "all" && row.personInCharge !== person) return false;
       if (rowFilter === "modified" && !modifiedIds.has(row.id)) return false;
       if (search && !row.indicator.toLowerCase().includes(search.toLowerCase()))
         return false;
       return true;
     });
-  }, [
-    indicators,
-    department,
-    parameter,
-    person,
-    rowFilter,
-    modifiedIds,
-    search,
-  ]);
+  }, [indicators, person, rowFilter, modifiedIds, search]);
 
   function markModified(id: string) {
     setModifiedIds((prev) => new Set(prev).add(id));
@@ -115,38 +152,71 @@ export default function KpiUpdate() {
     markModified(id);
   }
 
-  function handleDeleteRow(id: string) {
-    setIndicators((prev) => prev.filter((row) => row.id !== id));
-    setModifiedIds((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
-    setConfirmDeleteId(null);
+  async function handleDeleteRow(id: string) {
+    setError(null);
+    try {
+      await deleteKpi(id);
+      setIndicators((prev) => prev.filter((row) => row.id !== id));
+      setModifiedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not delete that record. Please try again.");
+    } finally {
+      setConfirmDeleteId(null);
+    }
   }
 
-  function handleDiscardChanges() {
-    setIndicators(originalIndicators);
-    setModifiedIds(new Set());
+  // "Discard changes" now means: throw away local edits and re-fetch
+  // from the backend, rather than reverting to a frozen mock snapshot.
+  async function handleDiscardChanges() {
     setEditingRowId(null);
+    await loadIndicators();
   }
 
+  // FIX: the original version filled in 0s locally but never called
+  // markModified(), so "Save"/"Submit" (which only loops over
+  // modifiedIds) silently skipped these rows - the bulk-fill would look
+  // like it worked but nothing would ever reach the backend. Marking the
+  // affected rows here is required for this to actually persist.
   function handleBulkFillMissing() {
     setIndicators((prev) =>
       prev.map((row) => {
+        const hadMissing = row.monthlyActual.some((v) => v === null);
+        if (!hadMissing) return row;
         const nextActual = row.monthlyActual.map((v) => (v === null ? 0 : v));
+        markModified(row.id);
         return { ...row, monthlyActual: nextActual };
       }),
     );
   }
 
+  // "draft" and "submit" both persist the same way today - see the
+  // top-of-file note in kpiService.ts on why there's no separate
+  // draft/submitted state on the backend yet. Annual target is never
+  // sent from here - this table has no input for it, only months.
   async function handleSave(type: "draft" | "submit") {
+    if (modifiedIds.size === 0) return;
     setSaving(true);
+    setError(null);
     try {
-      // TODO: replace with real API call once backend endpoint exists.
-      console.log(`Saving as ${type}`, indicators);
-      await new Promise((r) => setTimeout(r, 500));
-      if (type === "submit") setModifiedIds(new Set());
+      const idsToSave = Array.from(modifiedIds);
+      const results = await Promise.all(
+        idsToSave.map((id) => {
+          const row = indicators.find((r) => r.id === id)!;
+          return saveIndicatorRow(row, { includeAnnualTarget: false });
+        }),
+      );
+
+      setIndicators((prev) =>
+        prev.map((row) => results.find((r) => r.id === row.id) ?? row),
+      );
+      setModifiedIds(new Set());
+      void type;
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Some changes didn't save. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -165,7 +235,11 @@ export default function KpiUpdate() {
           </p>
         </div>
         <div className="kpi-update-top-actions">
-          <button type="button" className="kpi-btn-outline">
+          <button
+            type="button"
+            className="kpi-btn-outline"
+            onClick={() => navigate("/kpi-entry")}
+          >
             <PlusCircle size={14} /> Create new entry
           </button>
           <button type="button" className="kpi-btn-outline" disabled>
@@ -173,6 +247,12 @@ export default function KpiUpdate() {
           </button>
         </div>
       </div>
+
+      {error && (
+        <p role="alert" style={{ color: "#b91c1c", margin: "8px 0" }}>
+          {error}
+        </p>
+      )}
 
       <div className="kpi-update-filterbar">
         <div className="kpi-update-filter-fields">
@@ -250,6 +330,7 @@ export default function KpiUpdate() {
             type="button"
             className="kpi-btn-outline"
             onClick={handleDiscardChanges}
+            disabled={saving}
           >
             <Undo2 size={14} /> Discard Changes
           </button>
@@ -257,7 +338,7 @@ export default function KpiUpdate() {
             type="button"
             className="kpi-btn-primary"
             onClick={() => handleSave("submit")}
-            disabled={saving}
+            disabled={saving || modifiedIds.size === 0}
           >
             <Send size={14} /> {saving ? "Submitting..." : "Submit Updates"}
           </button>
@@ -285,7 +366,7 @@ export default function KpiUpdate() {
           <ChevronDown size={14} className="kpi-select-icon" />
         </div>
         <span className="kpi-save-status">
-          <Check size={13} /> All changes saved
+          <Check size={13} /> {modifiedIds.size === 0 ? "All changes saved" : `${modifiedIds.size} unsaved row(s)`}
         </span>
       </div>
 
@@ -318,7 +399,16 @@ export default function KpiUpdate() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((row) => {
+            {isLoading && (
+              <tr>
+                <td colSpan={6 + MONTHS.length} className="kpi-empty">
+                  Loading KPI data...
+                </td>
+              </tr>
+            )}
+
+            {!isLoading &&
+              filtered.map((row) => {
               const isModified = modifiedIds.has(row.id);
               const isEditing = editingRowId === row.id;
               const eoyActual = getEndOfYearActual(row.monthlyActual);
@@ -446,7 +536,7 @@ export default function KpiUpdate() {
                 </>
               );
             })}
-            {filtered.length === 0 && (
+            {!isLoading && filtered.length === 0 && (
               <tr>
                 <td colSpan={6 + MONTHS.length} className="kpi-empty">
                   No records match your filters.
@@ -472,7 +562,7 @@ export default function KpiUpdate() {
           <div>
             <span className="kpi-footer-label">Auto-saved</span>
             <span className="kpi-footer-value kpi-footer-value-small">
-              Just now
+              –
             </span>
           </div>
         </div>
@@ -493,7 +583,7 @@ export default function KpiUpdate() {
             type="button"
             className="kpi-btn-outline"
             onClick={() => handleSave("draft")}
-            disabled={saving}
+            disabled={saving || modifiedIds.size === 0}
           >
             <Save size={14} /> Save as draft
           </button>
@@ -501,7 +591,7 @@ export default function KpiUpdate() {
             type="button"
             className="kpi-btn-primary"
             onClick={() => handleSave("submit")}
-            disabled={saving}
+            disabled={saving || modifiedIds.size === 0}
           >
             <Send size={14} />{" "}
             {saving ? "Submitting..." : "Finalize submission"}

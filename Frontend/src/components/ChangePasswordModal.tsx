@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { X, Lock, Eye, EyeOff } from "lucide-react";
+import { api, ApiError } from "../services/api";
 import "../styles/Modal.css";
 import "../styles/ChangePasswordModal.css";
 
@@ -16,11 +17,18 @@ export default function ChangePasswordModal({ onCancel }: ChangePasswordModalPro
   const [showNew, setShowNew] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    setSuccess(false);
 
+    // Validate
+    if (!currentPassword) {
+      setError("Please enter your current password.");
+      return;
+    }
     if (newPassword.length < 8) {
       setError("New password must be at least 8 characters.");
       return;
@@ -29,14 +37,38 @@ export default function ChangePasswordModal({ onCancel }: ChangePasswordModalPro
       setError("Passwords do not match.");
       return;
     }
+    if (newPassword === currentPassword) {
+      setError("New password must be different from current password.");
+      return;
+    }
 
     setSaving(true);
     try {
-      // TODO: call change-password service once backend endpoint exists
-      onCancel();
+      await api.post("/users/me/change-password", {
+        current_password: currentPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      });
+
+      setSuccess(true);
+      setSaving(false);
+
+      // Close modal after successful change with a small delay
+      setTimeout(() => {
+        onCancel();
+      }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not update password.");
-    } finally {
+      if (err instanceof ApiError) {
+        if (err.errorCode === "INCORRECT_PASSWORD") {
+          setError("Current password is incorrect.");
+        } else if (err.errorCode === "WEAK_PASSWORD") {
+          setError("Password is too weak. Please use at least 8 characters with uppercase, lowercase, number, and special character.");
+        } else {
+          setError(err.message || "Could not update password. Please try again.");
+        }
+      } else {
+        setError("Could not update password. Please try again.");
+      }
       setSaving(false);
     }
   }
@@ -62,12 +94,14 @@ export default function ChangePasswordModal({ onCancel }: ChangePasswordModalPro
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 autoComplete="current-password"
+                disabled={saving}
               />
               <button
                 type="button"
                 className="cp-toggle-visibility"
                 onClick={() => setShowCurrent((v) => !v)}
                 aria-label="Toggle current password visibility"
+                disabled={saving}
               >
                 {showCurrent ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
@@ -84,16 +118,19 @@ export default function ChangePasswordModal({ onCancel }: ChangePasswordModalPro
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 autoComplete="new-password"
+                disabled={saving}
               />
               <button
                 type="button"
                 className="cp-toggle-visibility"
                 onClick={() => setShowNew((v) => !v)}
                 aria-label="Toggle new password visibility"
+                disabled={saving}
               >
                 {showNew ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
+            <small className="cp-hint">Must be at least 8 characters with uppercase, lowercase, number, and special character.</small>
           </div>
 
           <div className="cp-form-group">
@@ -106,14 +143,16 @@ export default function ChangePasswordModal({ onCancel }: ChangePasswordModalPro
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 autoComplete="new-password"
+                disabled={saving}
               />
             </div>
           </div>
 
           {error && <p className="cp-error">{error}</p>}
+          {success && <p className="cp-success">Password updated successfully!</p>}
 
           <div className="app-modal-actions">
-            <button type="button" className="app-btn-secondary" onClick={onCancel}>
+            <button type="button" className="app-btn-secondary" onClick={onCancel} disabled={saving}>
               Cancel
             </button>
             <button type="submit" className="app-btn-primary" disabled={saving}>

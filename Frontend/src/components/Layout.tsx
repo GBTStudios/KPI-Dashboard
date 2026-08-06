@@ -94,7 +94,10 @@ export default function Layout() {
 
   return (
     <div className="app-layout">
-      <Sidebar onSignOut={() => setShowLogoutModal(true)} />
+      <Sidebar
+        onSignOut={() => setShowLogoutModal(true)}
+        userName={currentUser?.full_name}
+      />
       <div className="app-main">
         <Header
           onAvatarClick={() => setShowProfileModal(true)}

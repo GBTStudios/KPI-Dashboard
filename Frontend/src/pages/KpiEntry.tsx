@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Save, Send, Search, ChevronDown, Check, Plus, X } from "lucide-react";
-import { mockKpiIndicators } from "../data/mockKpiData";
 import { MONTHS, getEndOfYearActual, getEndOfYearTarget } from "../types/kpi";
 import type { KpiIndicator } from "../types/kpi";
+import { listKpis, createKpi, saveIndicatorRow } from "../services/kpiService";
+import { ApiError } from "../services/api";
 import "../styles/KpiEntry.css";
 
 const DEPARTMENTS = [
@@ -51,14 +53,39 @@ const emptyNewRow: NewRowForm = {
 };
 
 export default function KpiEntry() {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"create" | "update">("create");
   const [year, setYear] = useState("2026");
   const [search, setSearch] = useState("");
-  const [indicators, setIndicators] =
-    useState<KpiIndicator[]>(mockKpiIndicators);
+  const [indicators, setIndicators] = useState<KpiIndicator[]>([]);
   const [modifiedIds, setModifiedIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const [newRow, setNewRow] = useState<NewRowForm>(emptyNewRow);
+  const [adding, setAdding] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const { items } = await listKpis({ year: Number(year) });
+        if (!cancelled) setIndicators(items);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof ApiError ? err.message : "Could not load KPI data.");
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [year]);
 
   const filtered = useMemo(() => {
     if (!search) return indicators;
@@ -107,38 +134,72 @@ export default function KpiEntry() {
     setModifiedIds((prev) => new Set(prev).add(id));
   }
 
-  function handleAddIndicator() {
-    if (!newRow.indicator || !newRow.annualTarget) return;
+  async function handleAddIndicator() {
+    // Clear previous errors
+    setError(null);
 
-    const target = Number(newRow.annualTarget);
-    const monthlyTarget = Array(12).fill(Math.round(target / 12));
+    // Validate all fields
+    if (!newRow.indicator) {
+      setError("Please enter an indicator name.");
+      return;
+    }
+    if (!newRow.annualTarget) {
+      setError("Please enter an annual target.");
+      return;
+    }
+    if (Number(newRow.annualTarget) <= 0) {
+      setError("Annual target must be greater than 0.");
+      return;
+    }
 
-    const newIndicator: KpiIndicator = {
-      id: crypto.randomUUID(),
-      department: newRow.department,
-      parameter: newRow.parameter,
-      personInCharge: newRow.personInCharge,
-      indicator: newRow.indicator,
-      annualTarget: target,
-      monthlyTarget,
-      monthlyActual: Array(12).fill(null),
-    };
-
-    setIndicators((prev) => [...prev, newIndicator]);
-    setNewRow((prev) => ({ ...prev, indicator: "", annualTarget: "" }));
+    setAdding(true);
+    try {
+      const created = await createKpi({
+        department: newRow.department,
+        parameter: newRow.parameter,
+        indicatorName: newRow.indicator,
+        annualTarget: Number(newRow.annualTarget),
+        personInCharge: newRow.personInCharge,
+        year: Number(year),
+      });
+      setIndicators((prev) => [...prev, created]);
+      setNewRow((prev) => ({ ...prev, indicator: "", annualTarget: "" }));
+      setError(null);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not create that KPI. Please try again.");
+    } finally {
+      setAdding(false);
+    }
   }
 
   function handleCancelNewRow() {
     setNewRow(emptyNewRow);
+    setError(null);
   }
 
   async function handleSave(type: "draft" | "submit") {
+    if (modifiedIds.size === 0) return;
     setSaving(true);
+    setError(null);
     try {
-      // TODO: replace with real API call once backend endpoint exists.
-      console.log(`Saving as ${type}`);
-      await new Promise((r) => setTimeout(r, 500));
+      const idsToSave = Array.from(modifiedIds);
+      const results = await Promise.all(
+        idsToSave.map((id) => {
+          const row = indicators.find((r) => r.id === id)!;
+          return saveIndicatorRow(row, { includeAnnualTarget: true });
+        }),
+      );
+
+      setIndicators((prev) =>
+        prev.map((row) => results.find((r) => r.id === row.id) ?? row),
+      );
       setModifiedIds(new Set());
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : `Some changes didn't save (${type === "draft" ? "draft" : "submit"} failed). Please try again.`,
+      );
     } finally {
       setSaving(false);
     }
@@ -164,12 +225,18 @@ export default function KpiEntry() {
           <button
             type="button"
             className={mode === "update" ? "active" : ""}
-            onClick={() => setMode("update")}
+            onClick={() => navigate("/kpi-update")}
           >
             Update entry
           </button>
         </div>
       </div>
+
+      {error && (
+        <p role="alert" style={{ color: "#b91c1c", margin: "8px 0" }}>
+          {error}
+        </p>
+      )}
 
       <div className="kpi-entry-filters">
         <div className="kpi-filter-group">
@@ -256,20 +323,38 @@ export default function KpiEntry() {
           />
         </div>
 
-        <button
-          type="button"
-          className="kpi-btn-outline"
-          onClick={handleCancelNewRow}
-        >
-          <X size={14} /> Cancel
-        </button>
-        <button
-          type="button"
-          className="kpi-btn-primary"
-          onClick={handleAddIndicator}
-        >
-          <Plus size={14} /> Add
-        </button>
+        {/* ✅ ADDED - Annual Target input */}
+        <div className="kpi-filter-group">
+          <label>Annual Target</label>
+          <input
+            type="number"
+            className="kpi-plain-input"
+            placeholder="e.g. 365"
+            value={newRow.annualTarget}
+            onChange={(e) =>
+              setNewRow((r) => ({ ...r, annualTarget: e.target.value }))
+            }
+          />
+        </div>
+
+        <div className="kpi-entry-filter-buttons">
+          <button
+            type="button"
+            className="kpi-btn-outline"
+            onClick={handleCancelNewRow}
+            disabled={adding}
+          >
+            <X size={14} /> Cancel
+          </button>
+          <button
+            type="button"
+            className="kpi-btn-primary"
+            onClick={handleAddIndicator}
+            disabled={adding}
+          >
+            <Plus size={14} /> {adding ? "Adding..." : "Add"}
+          </button>
+        </div>
       </div>
 
       <div className="kpi-entry-toolbar">
@@ -290,7 +375,7 @@ export default function KpiEntry() {
           <ChevronDown size={14} className="kpi-select-icon" />
         </div>
         <span className="kpi-save-status">
-          <Check size={13} /> All changes saved
+          <Check size={13} /> {modifiedIds.size === 0 ? "All changes saved" : `${modifiedIds.size} unsaved row(s)`}
         </span>
       </div>
 
@@ -325,7 +410,16 @@ export default function KpiEntry() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((row) => {
+            {isLoading && (
+              <tr>
+                <td colSpan={7 + MONTHS.length} className="kpi-empty">
+                  Loading KPI data...
+                </td>
+              </tr>
+            )}
+
+            {!isLoading &&
+              filtered.map((row) => {
               const isModified = modifiedIds.has(row.id);
               const eoyActual = getEndOfYearActual(row.monthlyActual);
               const eoyTarget = getEndOfYearTarget(row.monthlyTarget);
@@ -450,7 +544,7 @@ export default function KpiEntry() {
                 </>
               );
             })}
-            {filtered.length === 0 && (
+            {!isLoading && filtered.length === 0 && (
               <tr>
                 <td colSpan={7 + MONTHS.length} className="kpi-empty">
                   No indicators match your search.
@@ -483,7 +577,7 @@ export default function KpiEntry() {
             type="button"
             className="kpi-btn-outline"
             onClick={() => handleSave("draft")}
-            disabled={saving}
+            disabled={saving || modifiedIds.size === 0}
           >
             <Save size={14} /> Save draft
           </button>
@@ -491,7 +585,7 @@ export default function KpiEntry() {
             type="button"
             className="kpi-btn-primary"
             onClick={() => handleSave("submit")}
-            disabled={saving}
+            disabled={saving || modifiedIds.size === 0}
           >
             <Send size={14} /> {saving ? "Submitting..." : "Submit KPI"}
           </button>
