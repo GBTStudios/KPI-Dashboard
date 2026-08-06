@@ -1,7 +1,3 @@
-// ============================================================
-// MOCK DATA — Import Data page
-// ============================================================
-
 import type { ImportStep, ExpectedColumn, LastImportInfo } from '../types/importData';
 
 export const importSteps: ImportStep[] = [
