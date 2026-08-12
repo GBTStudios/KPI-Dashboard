@@ -23,15 +23,6 @@ import type { ImportRecord, ImportHistorySummaryData } from '../types/importHist
 
 import '../styles/ImportHistory.css';
 
-
-// NO MOCK DATA, per spec.
-// `records` starts as an empty array — this is exactly what the
-// UI will look like on day one, before any backend exists, and
-// also exactly what it looks like if a real API call returns zero
-// results. Both cases should render the SAME empty state, so
-// testing with `[]` right now is actually testing real behavior,
-// not a placeholder.
-//
 // `summaryData` uses `null` for every field for the same reason:
 // null means "no value yet," which the summary cards render as "—".
 
