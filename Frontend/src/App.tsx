@@ -13,7 +13,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import VerifyEmailCode from "./pages/VerifyEmailCode";
 import KpiUpdate from "./pages/KpiUpdate";
 import ImportHistory from "./pages/ImportHistory";
-import DepartmentDashboard from "./pages/DeparmentDashboard";
+import DepartmentDashboard from "./pages/DepartmentDashboard";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import { getAccessToken } from "./services/api";

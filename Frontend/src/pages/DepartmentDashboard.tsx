@@ -15,7 +15,7 @@
 import { useState } from 'react';
 
 import Breadcrumb from '../components/Breadcrumb';
-import DepartmentFilters from '../components/DepartmentDashboard/DepartmentFliters';
+import DepartmentFilters from '../components/DepartmentDashboard/DepartmentFilters';
 import FundingSummaryCards from '../components/FundingDashboard/FundingSummaryCards';
 import MonthlyPerformanceChart from '../components/FundingDashboard/MonthlyPerformanceChart';
 import ParameterPerformance from '../components/FundingDashboard/ParameterPerformance';
@@ -27,7 +27,7 @@ import KpiAlerts from '../components/FundingDashboard/KpiAlerts';
 import RecentActivity from '../components/FundingDashboard/RecentActivity';
 
 import { departmentDashboardData } from '../data/departmentDashboardData';
-import { ALL_DEPARTMENTS, type DepartmentKey } from '../types/deparmentDashboard';
+import { ALL_DEPARTMENTS, type DepartmentKey } from '../types/departmentDashboard';
 
 import '../styles/FundingDashboard.css';
 
