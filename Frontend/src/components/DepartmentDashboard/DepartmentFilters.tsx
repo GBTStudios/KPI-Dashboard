@@ -5,7 +5,7 @@
 // be given one of the 7 real department names, never a typo.
 
 import { Download } from 'lucide-react';
-import type { DepartmentFilterOptions, DepartmentKey } from '../../types/deparmentDashboard';
+import type { DepartmentFilterOptions, DepartmentKey } from '../../types/departmentDashboard';
 
 interface DepartmentFiltersProps {
   options: DepartmentFilterOptions;

@@ -21,7 +21,7 @@
 //     KpiAlerts.tsx already handles (renders "0 items need
 //     attention" and no alert rows).
 
-import type { DepartmentDashboardData } from '../types/deparmentDashboard';
+import type { DepartmentDashboardData } from '../types/departmentDashboard';
 
 const onTarget = (): { status: 'on-target' } => ({ status: 'on-target' });
 const atRisk = (label: string): { status: 'at-risk'; valueLabel: string } => ({

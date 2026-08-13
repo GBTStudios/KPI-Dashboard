@@ -3,6 +3,7 @@ import type { KpiIndicator } from "../types/kpi";
 export const mockKpiIndicators: KpiIndicator[] = [
   {
     id: "1",
+    year: 2025,
     department: "Programs",
     parameter: "Campus",
     indicator: "Electricity uptime days/month",
@@ -13,6 +14,7 @@ export const mockKpiIndicators: KpiIndicator[] = [
   },
   {
     id: "2",
+    year: 2025,
     department: "Programs",
     parameter: "Campus",
     indicator: "Internet uptime days/month",
@@ -23,6 +25,7 @@ export const mockKpiIndicators: KpiIndicator[] = [
   },
   {
     id: "3",
+    year: 2025,
     department: "Programs",
     parameter: "Campus",
     indicator: "Beds occupied",
@@ -33,6 +36,7 @@ export const mockKpiIndicators: KpiIndicator[] = [
   },
   {
     id: "4",
+    year: 2025,
     department: "Marketing",
     parameter: "Digital",
     indicator: "Referral traffic",
@@ -43,6 +47,7 @@ export const mockKpiIndicators: KpiIndicator[] = [
   },
   {
     id: "5",
+    year: 2025,
     department: "Funding",
     parameter: "Grants",
     indicator: "Grant applications submitted",
