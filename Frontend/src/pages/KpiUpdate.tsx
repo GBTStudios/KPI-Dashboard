@@ -140,7 +140,7 @@ export default function KpiUpdate() {
     monthIndex: number,
     value: string,
   ) {
-    const numValue = value === "" ? 0 : Number(value);
+    const numValue = value === "" ? null : Number(value);
     setIndicators((prev) =>
       prev.map((row) => {
         if (row.id !== id) return row;
@@ -500,7 +500,9 @@ export default function KpiUpdate() {
                             }
                           />
                         ) : (
-                          <span>{val}</span>
+                          <span className={val === null ? "kpi-missing" : ""}>
+                            {val === null ? "–" : val}
+                          </span>
                         )}
                       </td>
                     ))}
@@ -512,7 +514,7 @@ export default function KpiUpdate() {
                     {row.monthlyTarget.map((target, i) => {
                       const actual = row.monthlyActual[i];
                       const pct =
-                        actual === null || actual === undefined
+                        actual === null || actual === undefined || target === null || target === undefined || target === 0
                           ? null
                           : Math.round((actual / target) * 100);
                       const tone =

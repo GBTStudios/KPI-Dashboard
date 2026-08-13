@@ -39,6 +39,14 @@ export interface DepartmentPerformanceData {
 // immediately flag it as an error.
 export type KpiStatus = 'On Target' | 'Near Target' | 'Below Target';
 
+// NOTE: `may`/`june` are legacy field names from when the comparison was
+// hardcoded to those two months. They now hold whichever two months are
+// actually selected (see dashboardService.ts) - the column HEADERS are
+// dynamic now too (see KpiTable.tsx's monthALabel/monthBLabel props),
+// but renaming these two fields everywhere they're read/written felt
+// like more churn than it's worth for an internal field name. Rename
+// freely if that inconsistency bothers you - nothing else depends on it
+// being called exactly "may"/"june".
 export interface KpiTableRow {
   indicator: string;
   department: string;
@@ -67,7 +75,11 @@ export interface ActivityItem {
 
 
 // 7. Filters (Compare Month 1 / Month 2 / Department)
+// CHANGED: added `years` - the Dashboard had no year selector at all
+// before (the backend was hardcoding the current year by omission). Now
+// populated from real distinct years in the data, not hardcoded.
 export interface FilterOptions {
   months: string[];        // list of month names to choose from
   departments: string[];   // list of department names to choose from
+  years?: number[];        // optional so this stays backward-compatible with any other caller of FilterOptions
 }

@@ -6,13 +6,13 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import KpiEntry from "./pages/KpiEntry";
 import ImportData from "./pages/ImportData";
+import ImportHistory from "./pages/ImportHistory";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
 import ResetPasswordSuccess from "./pages/ResetPasswordSuccess";
 import VerifyEmail from "./pages/VerifyEmail";
 import VerifyEmailCode from "./pages/VerifyEmailCode";
 import KpiUpdate from "./pages/KpiUpdate";
-import ImportHistory from "./pages/ImportHistory"
 // import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import { getAccessToken } from "./services/api";

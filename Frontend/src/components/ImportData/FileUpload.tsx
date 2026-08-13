@@ -2,20 +2,24 @@
 // FileUpload.tsx
 // ------------------------------------------------------------
 // Handles the dashed-border upload area: drag & drop, click-to-
-// browse, file type/size validation, and showing the selected
-// file (or an error) using React state.
+// browse, file type/size validation, showing the selected file,
+// and now the actual upload itself.
+//
+// CHANGED: accepted types and max size now match the backend exactly
+// (.xlsx and .csv, 10MB) instead of the earlier .xlsx/.xls/.csv at
+// 25MB - .xls was dropped since the backend can't parse it without
+// reintroducing xlrd, which the original spec explicitly ruled out.
 // ============================================================
 
 import { useRef, useState } from 'react';
 import type { DragEvent, ChangeEvent } from 'react';
-import { Upload, X, FileSpreadsheet, AlertCircle } from 'lucide-react';
+import { Upload, X, FileSpreadsheet, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import type { UploadedFileInfo } from '../../types/importData';
+import { uploadImport, type ImportResult, type ImportRowErrorInfo } from '../../services/importService';
 
-const ACCEPTED_EXTENSIONS = ['.xlsx', '.xls', '.csv'];
-const MAX_SIZE_BYTES = 25 * 1024 * 1024; // 25MB, expressed in bytes
+const ACCEPTED_EXTENSIONS = ['.xlsx', '.csv'];
+const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB - matches the backend's limit exactly
 
-// Small, self-contained helper functions are easier to test and
-// read than inlining this logic inside the component itself.
 function formatFileSize(bytes: number): string {
   const megabytes = bytes / (1024 * 1024);
   return `${megabytes.toFixed(1)} MB`;
@@ -26,33 +30,39 @@ function getFileExtension(filename: string): string {
   return `.${parts[parts.length - 1].toLowerCase()}`;
 }
 
-export default function FileUpload() {
-  // useRef<HTMLInputElement>(null) — "this will eventually point to
-  // an <input> element, but starts out pointing at nothing (null)."
+interface FileUploadProps {
+  onImportStart?: () => void;
+  onImportComplete?: (result: ImportResult) => void;
+  onImportError?: () => void;
+}
+
+export default function FileUpload({ onImportStart, onImportComplete, onImportError }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [selectedFile, setSelectedFile] = useState<UploadedFileInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragActive, setIsDragActive] = useState(false);
 
-  // Shared validation logic used by BOTH drag-drop and click-to-browse,
-  // so the two input methods can never enforce different rules.
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState<ImportResult | null>(null);
+
   function validateAndSetFile(file: File) {
     const extension = getFileExtension(file.name);
 
     if (!ACCEPTED_EXTENSIONS.includes(extension)) {
-      setError('Unsupported file type. Please upload a .xlsx, .xls, or .csv file.');
+      setError('Unsupported file type. Please upload a .xlsx or .csv file.');
       setSelectedFile(null);
       return;
     }
 
     if (file.size > MAX_SIZE_BYTES) {
-      setError('File is too large. Maximum size is 25MB.');
+      setError('File is too large. Maximum size is 10MB.');
       setSelectedFile(null);
       return;
     }
 
     setError(null);
+    setUploadResult(null);
     setSelectedFile({
       file,
       name: file.name,
@@ -63,22 +73,18 @@ export default function FileUpload() {
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) validateAndSetFile(file);
-
-    // Reset the input's value. Without this, selecting the SAME file
-    // twice in a row wouldn't fire onChange the second time, since
-    // the input's value technically hasn't changed.
     e.target.value = '';
   }
 
   function handleDrop(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault(); // stops the browser from opening the file itself
+    e.preventDefault();
     setIsDragActive(false);
     const file = e.dataTransfer.files?.[0];
     if (file) validateAndSetFile(file);
   }
 
   function handleDragOver(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault(); // required, or the onDrop event won't fire at all
+    e.preventDefault();
     setIsDragActive(true);
   }
 
@@ -89,6 +95,24 @@ export default function FileUpload() {
   function handleRemoveFile() {
     setSelectedFile(null);
     setError(null);
+    setUploadResult(null);
+  }
+
+  async function handleUpload() {
+    if (!selectedFile) return;
+    setIsUploading(true);
+    setError(null);
+    onImportStart?.();
+    try {
+      const result = await uploadImport(selectedFile.file);
+      setUploadResult(result);
+      onImportComplete?.(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Import failed. Please try again.');
+      onImportError?.();
+    } finally {
+      setIsUploading(false);
+    }
   }
 
   return (
@@ -105,9 +129,7 @@ export default function FileUpload() {
               <Upload size={30} color="#5575f2" />
             </div>
             <div className="upload-title">Drag and drop your spreadsheet</div>
-            <div className="upload-subtitle">
-              Supports .xlsx, .xls, and .csv formats (Max 25MB)
-            </div>
+            <div className="upload-subtitle">Supports .xlsx and .csv formats (Max 10MB)</div>
 
             <button
               type="button"
@@ -117,13 +139,10 @@ export default function FileUpload() {
               <span className="upload-select-plus">+</span> Select File
             </button>
 
-            {/* This input is visually hidden via CSS (see .upload-hidden-input) —
-                we never want the browser's default file input UI showing,
-                only our own styled button. */}
             <input
               ref={inputRef}
               type="file"
-              accept=".xlsx,.xls,.csv"
+              accept=".xlsx,.csv"
               onChange={handleInputChange}
               className="upload-hidden-input"
             />
@@ -141,6 +160,7 @@ export default function FileUpload() {
               className="upload-remove-btn"
               onClick={handleRemoveFile}
               aria-label="Remove selected file"
+              disabled={isUploading}
             >
               <X size={16} />
             </button>
@@ -153,6 +173,69 @@ export default function FileUpload() {
           <AlertCircle size={14} />
           {error}
         </div>
+      )}
+
+      {selectedFile && !uploadResult && (
+        <button
+          type="button"
+          className="upload-select-btn upload-submit-btn"
+          onClick={handleUpload}
+          disabled={isUploading}
+        >
+          {isUploading ? (
+            <>
+              <Loader2 size={14} className="upload-spinner" /> Uploading...
+            </>
+          ) : (
+            'Upload and process'
+          )}
+        </button>
+      )}
+
+      {uploadResult && (
+        <ImportResultPanel result={uploadResult} />
+      )}
+    </div>
+  );
+}
+
+/** Shows what happened after a completed upload: rows imported vs.
+ * failed, and the specific row-level errors if anything failed - the
+ * backend still reports a full result even on PARTIAL_SUCCESS/FAILED,
+ * not just a pass/fail flag, so this surfaces it instead of throwing
+ * it away. Uses new class names (upload-result*) - not yet present in
+ * ImportData.css, since I don't have that stylesheet; ask me for it
+ * and I'll add matching rules instead of leaving this unstyled. */
+function ImportResultPanel({ result }: { result: ImportResult }) {
+  const { record, rowErrors } = result;
+  const tone =
+    record.status === 'completed' ? 'success' : record.status === 'partial' ? 'partial' : 'failed';
+
+  return (
+    <div className={`upload-result upload-result-${tone}`}>
+      <div className="upload-result-header">
+        {tone === 'success' ? (
+          <CheckCircle2 size={16} />
+        ) : (
+          <AlertCircle size={16} />
+        )}
+        <span>
+          {record.status === 'completed' && `Imported all ${record.rows} row(s) successfully.`}
+          {record.status === 'partial' &&
+            `Imported ${record.rows - rowErrors.length} of ${record.rows} row(s) - ${rowErrors.length} failed.`}
+          {record.status === 'failed' && `Import failed - 0 of ${record.rows} row(s) were imported.`}
+        </span>
+      </div>
+
+      {rowErrors.length > 0 && (
+        <ul className="upload-result-errors">
+          {rowErrors.map((e: ImportRowErrorInfo, i: number) => (
+            <li key={i}>
+              Row {e.rowNumber}
+              {e.column ? ` (${e.column})` : ''}: {e.message}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

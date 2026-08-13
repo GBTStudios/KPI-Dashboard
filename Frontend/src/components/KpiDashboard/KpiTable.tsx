@@ -1,13 +1,21 @@
 // Renders the "KPIs requiring attention" table, including:
 //  - colored change indicators (green up-arrow / red down-arrow)
 //  - colored status badges (On Target / Near Target / Below Target)
-
+//
+// CHANGED: monthALabel/monthBLabel are new, optional props (default to
+// "May"/"Jun" so nothing breaks if a caller doesn't pass them). The
+// column headers used to be hardcoded text - harmless with static mock
+// data, but wrong once the Dashboard's month filters are real: comparing
+// March vs. September would still show "May"/"Jun" headers. Everything
+// else in this component is untouched.
 
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import type { KpiTableRow, KpiStatus } from '../../types/dashboard';
 
 interface KpiTableProps {
   rows: KpiTableRow[];
+  monthALabel?: string;
+  monthBLabel?: string;
 }
 
 // Maps each possible status to its CSS class. Because KpiStatus is a
@@ -23,7 +31,7 @@ const statusClassMap: Record<KpiStatus, string> = {
 function countCriticalAlerts(rows: KpiTableRow[]): number {
   return rows.filter((row) => row.status === 'Below Target').length;
 }
-export default function KpiTable({ rows }: KpiTableProps) {
+export default function KpiTable({ rows, monthALabel = 'May', monthBLabel = 'Jun' }: KpiTableProps) {
   const criticalCount = countCriticalAlerts(rows);
 
   return (
@@ -46,8 +54,8 @@ export default function KpiTable({ rows }: KpiTableProps) {
             <tr>
               <th>Indicator</th>
               <th>Department</th>
-              <th>May</th>
-              <th>Jun</th>
+              <th>{monthALabel}</th>
+              <th>{monthBLabel}</th>
               <th>Change</th>
               <th>Status</th>
             </tr>

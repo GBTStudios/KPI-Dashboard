@@ -122,7 +122,7 @@ export default function KpiEntry() {
     monthIndex: number,
     value: string,
   ) {
-    const numValue = value === "" ? 0 : Number(value);
+    const numValue = value === "" ? null : Number(value);
     setIndicators((prev) =>
       prev.map((row) => {
         if (row.id !== id) return row;
@@ -520,7 +520,7 @@ export default function KpiEntry() {
                     {row.monthlyTarget.map((target, i) => {
                       const actual = row.monthlyActual[i];
                       const pct =
-                        actual === null || actual === undefined
+                        actual === null || actual === undefined || target === null || target === undefined || target === 0
                           ? null
                           : Math.round((actual / target) * 100);
                       const tone =
