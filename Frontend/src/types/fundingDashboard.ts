@@ -1,5 +1,10 @@
+// ============================================================
+// TYPES — Funding Department Dashboard
+// ============================================================
 
+// --------------------------------------------------------------
 // Filters
+// --------------------------------------------------------------
 export interface FundingFilterOptions {
   departments: string[];
   years: string[];
@@ -7,7 +12,9 @@ export interface FundingFilterOptions {
   parameters: string[];
 }
 
+// --------------------------------------------------------------
 // Summary cards
+// --------------------------------------------------------------
 export type SummaryCardTone = 'primary' | 'success' | 'danger' | 'neutral';
 
 export interface FundingSummaryCard {
@@ -20,21 +27,27 @@ export interface FundingSummaryCard {
   tone: SummaryCardTone;
 }
 
+// --------------------------------------------------------------
 // Monthly Performance Trend chart
+// --------------------------------------------------------------
 export interface MonthlyTrendPoint {
   month: string;
   actual: number;
   target: number;
 }
 
+// --------------------------------------------------------------
 // Parameter Performance
+// --------------------------------------------------------------
 export interface ParameterPerformanceItem {
   name: string;
   percentage: number;
   color: string;
 }
 
+// --------------------------------------------------------------
 // KPI Performance Overview table
+// --------------------------------------------------------------
 export type KpiStatus = 'On Target' | 'Near Target' | 'Below Target';
 export type KpiTrend = 'up' | 'down';
 
@@ -47,7 +60,9 @@ export interface KpiOverviewRow {
   trend: KpiTrend;
 }
 
+// --------------------------------------------------------------
 // Monthly Performance Heatmap
+// --------------------------------------------------------------
 export type HeatmapCellStatus = 'on-target' | 'at-risk' | 'below-target';
 
 export interface HeatmapCell {
@@ -64,7 +79,9 @@ export interface HeatmapRow {
   cells: HeatmapCell[]; // exactly 12, Jan–Dec
 }
 
+// --------------------------------------------------------------
 // Annual Target Progress
+// --------------------------------------------------------------
 export interface AnnualTargetProgressData {
   targetLabel: string;     // "700,000 EUR"
   currentLabel: string;    // "612,450 EUR"
@@ -73,15 +90,19 @@ export interface AnnualTargetProgressData {
   daysLeftLabel: string;   // "184 Days"
 }
 
+// --------------------------------------------------------------
 // May vs June Comparison
+// --------------------------------------------------------------
 export interface ComparisonItem {
   label: string;
   changeLabel: string; // "+12.4%"
   direction: 'up' | 'down';
 }
 
+// --------------------------------------------------------------
 // KPI Alerts
-export type AlertTone = 'danger' | 'warning';
+// --------------------------------------------------------------
+export type AlertTone = 'danger' | 'warning' | 'success';
 
 export interface AlertItem {
   id: string;
@@ -90,7 +111,9 @@ export interface AlertItem {
   tone: AlertTone;
 }
 
+// --------------------------------------------------------------
 // Recent Activity
+// --------------------------------------------------------------
 export interface FundingActivityItem {
   id: string;
   actor: string;
