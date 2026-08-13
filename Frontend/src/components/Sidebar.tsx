@@ -10,15 +10,15 @@ import {
   Settings,
   LogOut,
   Building2,
-  Wallet,
   ChevronDown,
 } from "lucide-react";
 import logo from "../assets/logo.png";
 import "../styles/Sidebar.css";
 
-// UNCHANGED — same array, same items, same order.
+// "Dashboard" is handled separately below (it's now a dropdown),
+// so it's no longer in this array. Every other item is UNCHANGED —
+// same order, same icons, same NavLink behavior.
 const navItems = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutGrid },
   { to: "/import-data", label: "Import Data", icon: Upload },
   { to: "/import-history", label: "Import History", icon: History },
   { to: "/kpi-entry", label: "KPI Entry", icon: ArrowRightLeft },
@@ -27,10 +27,11 @@ const navItems = [
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
-// NEW — kept as its own small array so adding more departments later
-// (Programs, Marketing, Mentorship, Partnerships) is a one-line change,
-// exactly as the spec asked for.
-const departmentLinks = [{ to: "/departments/funding", label: "Funding", icon: Wallet }];
+// The two links nested under the Dashboard dropdown.
+const dashboardSublinks = [
+  { to: "/dashboard", label: "Dashboard Overview" },
+  { to: "/department-dashboard", label: "Department Dashboard" },
+];
 
 interface SidebarProps {
   onSignOut?: () => void;
@@ -52,57 +53,52 @@ export default function Sidebar({
 
   const location = useLocation();
 
-  // Starts open if we're already on a /departments/* route, so a
-  // hard refresh on /departments/funding doesn't hide the active link
-  // inside a collapsed menu. useState(() => ...) with a function runs
-  // this check only once, on first render — not on every re-render.
-  const [isDepartmentsOpen, setIsDepartmentsOpen] = useState(() =>
-    location.pathname.startsWith("/departments"),
+  // The Dashboard section is "active" whenever the user is on EITHER
+  // of its two sub-routes — not just an exact string match, since
+  // there are two possible pages under this one dropdown.
+  const isDashboardRoute =
+    location.pathname === "/dashboard" ||
+    location.pathname === "/department-dashboard";
+
+  const [isDashboardOpen, setIsDashboardOpen] = useState(
+    () => isDashboardRoute,
   );
 
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <img src={logo} alt="Groundbreaker Talents logo" className="sidebar-logo" />
+        <img
+          src={logo}
+          alt="Groundbreaker Talents logo"
+          className="sidebar-logo"
+        />
         <span className="sidebar-brand-name">Groundbreaker Talents</span>
       </div>
 
       <nav className="sidebar-nav">
-        {navItems.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
-          >
-            <span className="sidebar-link-icon">
-              <Icon size={16} />
-            </span>
-            <span>{label}</span>
-          </NavLink>
-        ))}
-
-        {/* NEW — Departments dropdown. Uses the exact same
-            .sidebar-link classes as every other item, so it inherits
-            identical spacing/hover/typography with zero new CSS
-            required for the base look. */}
+        {/* Dashboard dropdown — replaces the old standalone Dashboard
+            NavLink. Reuses the exact same .sidebar-link / .active
+            classes as every other item, so the highlighted look is
+            identical, just applied conditionally instead of via
+            NavLink's automatic isActive (a <button> can't use that). */}
         <button
           type="button"
           className={`sidebar-link sidebar-dropdown-toggle ${
-            isDepartmentsOpen ? "open" : ""
+            isDashboardOpen ? "open" : ""
           }`}
-          onClick={() => setIsDepartmentsOpen((prev) => !prev)}
-          aria-expanded={isDepartmentsOpen}
+          onClick={() => setIsDashboardOpen((prev) => !prev)}
+          aria-expanded={isDashboardOpen}
         >
           <span className="sidebar-link-icon">
-            <Building2 size={16} />
+            <LayoutGrid size={16} />
           </span>
-          <span>Departments</span>
+          <span>Dashboard</span>
           <ChevronDown size={14} className="sidebar-dropdown-chevron" />
         </button>
 
-        {isDepartmentsOpen && (
+        {isDashboardOpen && (
           <div className="sidebar-sublist">
-            {departmentLinks.map(({ to, label, icon: Icon }) => (
+            {dashboardSublinks.map(({ to, label }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -111,13 +107,28 @@ export default function Sidebar({
                 }
               >
                 <span className="sidebar-link-icon">
-                  <Icon size={15} />
+                  <Building2 size={15} />
                 </span>
                 <span>{label}</span>
               </NavLink>
             ))}
           </div>
         )}
+
+        {navItems.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `sidebar-link ${isActive ? "active" : ""}`
+            }
+          >
+            <span className="sidebar-link-icon">
+              <Icon size={16} />
+            </span>
+            <span>{label}</span>
+          </NavLink>
+        ))}
       </nav>
 
       <div className="sidebar-footer">

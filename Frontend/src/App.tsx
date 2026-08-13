@@ -12,8 +12,8 @@ import ResetPasswordSuccess from "./pages/ResetPasswordSuccess";
 import VerifyEmail from "./pages/VerifyEmail";
 import VerifyEmailCode from "./pages/VerifyEmailCode";
 import KpiUpdate from "./pages/KpiUpdate";
-import ImportHistory from "./pages/ImportHistory"
-import FundingDashboard from "./pages/FundingDashboard";
+import ImportHistory from "./pages/ImportHistory";
+import DepartmentDashboard from "./pages/DepartmentDashboard";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import { getAccessToken } from "./services/api";
@@ -61,7 +61,11 @@ export default function App() {
 
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/departments/funding" element={<FundingDashboard />} />
+
+          <Route
+            path="/department-dashboard"
+            element={<DepartmentDashboard />}
+          />
           <Route path="/kpi-entry" element={<KpiEntry />} />
           <Route path="/kpi-update" element={<KpiUpdate />} />
           <Route path="/import-data" element={<ImportData />} />

@@ -1,11 +1,16 @@
-// FundingFilters.tsx
-import { Download } from 'lucide-react';
-import type { FundingFilterOptions } from '../../types/fundingDashboard';
+// Refactored from the old FundingFilters.tsx. Structurally almost
+// identical — same controlled-select pattern — the real change is
+// `department`/`onDepartmentChange` are now typed as DepartmentKey
+// instead of a free-form string, so this component can only ever
+// be given one of the 7 real department names, never a typo.
 
-interface FundingFiltersProps {
-  options: FundingFilterOptions;
-  department: string;
-  onDepartmentChange: (value: string) => void;
+import { Download } from 'lucide-react';
+import type { DepartmentFilterOptions, DepartmentKey } from '../../types/deparmentDashboard';
+
+interface DepartmentFiltersProps {
+  options: DepartmentFilterOptions;
+  department: DepartmentKey;
+  onDepartmentChange: (value: DepartmentKey) => void;
   year: string;
   onYearChange: (value: string) => void;
   month: string;
@@ -15,7 +20,7 @@ interface FundingFiltersProps {
   onExport: () => void;
 }
 
-export default function FundingFilters({
+export default function DepartmentFilters({
   options,
   department,
   onDepartmentChange,
@@ -26,7 +31,7 @@ export default function FundingFilters({
   parameter,
   onParameterChange,
   onExport,
-}: FundingFiltersProps) {
+}: DepartmentFiltersProps) {
   return (
     <div className="funding-filters">
       <div className="funding-filters-group">
@@ -35,7 +40,12 @@ export default function FundingFilters({
           <select
             className="funding-filter-select"
             value={department}
-            onChange={(e) => onDepartmentChange(e.target.value)}
+            // e.target.value is always `string` in the DOM, so it's
+            // cast to DepartmentKey here. This is safe (not a lie to
+            // the compiler) because every <option> below is rendered
+            // FROM options.departments, which is already typed as
+            // DepartmentKey[] — the value can never be anything else.
+            onChange={(e) => onDepartmentChange(e.target.value as DepartmentKey)}
           >
             {options.departments.map((dept) => (
               <option key={dept} value={dept}>

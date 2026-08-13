@@ -31,40 +31,46 @@
   gap: 18px;
   width: 100%;
   box-sizing: border-box;
-  padding: 2px;
+  padding: 20px;
   color: var(--color-text-main);
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* breadcrumb */
+/*    Breadcrumb + heading   */
 .breadcrumb {
-  font-size: 12px;
-  display: flex;
-  gap: 6px;
-}
- 
-.breadcrumb-segment {
   display: flex;
   align-items: center;
-  gap: 6px;
+  margin-bottom: 3px;
+  font-size: 10px;
+  line-height: 1.4;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #6b7280;
 }
- 
+
+.breadcrumb-segment {
+  display: inline-flex;
+  align-items: center;
+}
+
 .breadcrumb-link {
-  color: var(--color-text-muted);
+  color: #6b7280;
   text-decoration: none;
+  font-weight: 400;
 }
- 
+
 .breadcrumb-link:hover {
-  color: var(--color-blue);
-  text-decoration: underline;
+  color: #1c5e59;
 }
- 
+
 .breadcrumb-current {
-  color: var(--color-text-muted);
+  color: #6b7280;
+  font-weight: 400;
 }
- 
+
 .breadcrumb-separator {
-  color: var(--color-border);
+  color: #9ca3af;
+  margin: 0 5px;
+  font-weight: 400;
 }
 
 .page-title {
@@ -116,10 +122,16 @@
   border: 1px solid var(--color-border);
   background: var(--color-card-bg);
   font-size: 13px;
-  font-family: inherit;
   color: var(--color-text-main);
-  min-width: 140px;
-  appearance: auto;
+  outline: none;
+  box-shadow: none;
+}
+
+.funding-filter-select:focus,
+.funding-filter-select:focus-visible {
+  outline: none;
+  border-color: var(--color-border);
+  box-shadow: none;
 }
 
 .funding-export-btn {
@@ -142,9 +154,7 @@
   opacity: 0.92;
 }
 
-
-   /* Summary cards */
-
+/*  Summary cards*/
 .funding-summary-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -249,9 +259,9 @@
   opacity: 0.8;
 }
 
-/* --------------------------------------------------------------
+/* 
    Charts row (Monthly Trend + Parameter Performance)
-   -------------------------------------------------------------- */
+ */
 .funding-charts-row {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
@@ -273,14 +283,11 @@
 
 .funding-chart-header {
   display: flex;
- align-items: flex-start;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 12px;
-}
-
-.funding-chart-header > div:first-child {
-  flex-shrink: 0;
 }
 
 .funding-chart-title {
@@ -292,16 +299,19 @@
 .funding-chart-subtitle {
   font-size: 12px;
   color: var(--color-text-muted);
-  white-space: nowrap;
 }
 
-.funding-chart-legend { display: flex; align-items: center; gap: 16px; flex-wrap: nowrap;   white-space: nowrap; }
+.funding-chart-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
 
 .legend-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--color-text-muted);
 }
 
@@ -388,7 +398,7 @@
   display: grid;
   grid-template-columns: 1.3fr 1fr;
   gap: 16px;
-   align-items: stretch;
+  align-items: start;
 }
 
 @media (max-width: 1050px) {
@@ -397,16 +407,12 @@
   }
 }
 
-
 .funding-table-card,
 .funding-heatmap-card {
   background: var(--color-card-bg);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   padding: 20px;
-  /* height: 100%; */
-  box-sizing: border-box;
-  height: auto;
 }
 
 .funding-table-header {
@@ -828,4 +834,14 @@
   font-size: 11px;
   color: var(--color-text-muted);
   margin-top: 2px;
+}
+
+/*    Success-tone alert (new) — positive/confirmation notices like
+   "Survey Data Validation: all data audited and locked."*/
+.funding-alert-item.tone-success {
+  background: var(--color-success-bg);
+  border-color: rgba(28, 94, 89, 0.15);
+}
+.funding-alert-item.tone-success .funding-alert-icon {
+  color: var(--color-success);
 }

@@ -5,13 +5,18 @@ import type { ParameterPerformanceItem } from '../../types/fundingDashboard';
 interface ParameterPerformanceProps {
   items: ParameterPerformanceItem[];
   onViewDetails: () => void;
+  subtitle?: string;
 }
 
-export default function ParameterPerformance({ items, onViewDetails }: ParameterPerformanceProps) {
+export default function ParameterPerformance({
+  items,
+  onViewDetails,
+  subtitle = 'Performance breakdown by funding channel',
+}: ParameterPerformanceProps) {
   return (
     <div className="funding-chart-card">
       <div className="funding-chart-title">Parameter Performance</div>
-      <div className="funding-chart-subtitle">Performance breakdown by funding channel</div>
+      <div className="funding-chart-subtitle">{subtitle}</div>
 
       <div className="parameter-perf-list">
         {items.map((item) => (
