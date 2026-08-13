@@ -74,6 +74,46 @@ class KpiRepository:
         result = await self.db.execute(self._base_indicator_query().where(KpiIndicator.id == indicator_id))
         return result.scalar_one_or_none()
 
+    async def get_indicator_by_name(self, parameter_id: uuid.UUID, indicator_name: str) -> KpiIndicator | None:
+        result = await self.db.execute(
+            self._base_indicator_query().where(
+                KpiIndicator.parameter_id == parameter_id, KpiIndicator.indicator_name == indicator_name
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def get_or_create_indicator(
+        self,
+        parameter_id: uuid.UUID,
+        indicator_name: str,
+        annual_target,
+        target_type: str,
+        measurement_unit: str,
+        person_in_charge: str | None,
+    ) -> tuple[KpiIndicator, bool]:
+        """Used by the import module (see ImportService). Returns
+        (indicator, created). On a hit, the existing indicator's metadata
+        (annual_target, target_type, measurement_unit, person_in_charge)
+        is intentionally left untouched - only new indicators get these
+        values from the imported row. This avoids 12 different monthly
+        rows for the same indicator silently overwriting each other's
+        idea of what the annual target should be."""
+        existing = await self.get_indicator_by_name(parameter_id, indicator_name)
+        if existing is not None:
+            return existing, False
+
+        indicator = KpiIndicator(
+            parameter_id=parameter_id,
+            indicator_name=indicator_name,
+            annual_target=annual_target,
+            target_type=target_type,
+            measurement_unit=measurement_unit,
+            person_in_charge=person_in_charge,
+        )
+        self.db.add(indicator)
+        await self.db.flush()
+        return indicator, True
+
     def add_indicator(self, indicator: KpiIndicator) -> None:
         self.db.add(indicator)
 

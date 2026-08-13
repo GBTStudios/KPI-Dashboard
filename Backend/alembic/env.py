@@ -21,6 +21,7 @@ import app.models.department  # noqa: F401
 import app.models.parameter  # noqa: F401
 import app.models.kpi_indicator  # noqa: F401
 import app.models.kpi_monthly_value  # noqa: F401
+import app.models.import_history  # noqa: F401
 
 config = context.config
 config.set_main_option(

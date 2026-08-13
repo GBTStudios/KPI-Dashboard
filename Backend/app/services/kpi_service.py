@@ -171,17 +171,16 @@ class KpiService:
         monthly_value = await self.repo.get_monthly_value(indicator_id, year, month_index)
 
         if monthly_value is None:
-            # First time this (year, month) is touched - default target_value
-            # to annual_target / 12 unless the caller explicitly provided one.
-            default_target = indicator.annual_target / Decimal(12)
-            target_value = (
-                Decimal(str(payload.target_value)) if payload.target_value is not None else default_target
-            )
+            # No auto-fill: every month's target is whatever the user
+            # actually typed in, nothing computed from annual_target.
+            # Left as None if the user hasn't entered a target for this
+            # month yet - percentage stays None too until they do (see
+            # _calculate_percentage).
             monthly_value = KpiMonthlyValue(
                 indicator_id=indicator_id,
                 year=year,
                 month=month_index,
-                target_value=target_value,
+                target_value=Decimal(str(payload.target_value)) if payload.target_value is not None else None,
                 actual_value=Decimal(str(payload.actual_value)) if payload.actual_value is not None else None,
             )
             self.repo.add_monthly_value(monthly_value)
