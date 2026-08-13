@@ -14,6 +14,7 @@ import VerifyEmailCode from "./pages/VerifyEmailCode";
 import KpiUpdate from "./pages/KpiUpdate";
 import ImportHistory from "./pages/ImportHistory";
 import DepartmentDashboard from "./pages/DepartmentDashboard";
+import ParameterPerformancePage from "./pages/ParameterPerformancePage";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import { getAccessToken } from "./services/api";
@@ -66,6 +67,7 @@ export default function App() {
             path="/department-dashboard"
             element={<DepartmentDashboard />}
           />
+            <Route path="/department-dashboard/parameters" element={<ParameterPerformancePage />} />
           <Route path="/kpi-entry" element={<KpiEntry />} />
           <Route path="/kpi-update" element={<KpiUpdate />} />
           <Route path="/import-data" element={<ImportData />} />

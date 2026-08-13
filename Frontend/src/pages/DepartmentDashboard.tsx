@@ -1,18 +1,16 @@
 // ============================================================
 // DepartmentDashboard.tsx
 // ------------------------------------------------------------
-// IMPORTANT — file naming: save this as exactly
-//   src/pages/DepartmentDashboard.tsx
-// and make sure these also match exactly on disk:
-//   src/components/DepartmentDashboard/DepartmentFilters.tsx
-//   src/types/departmentDashboard.ts
-// If you still have typo'd versions (DeparmentDashboard.tsx,
-// DepartmentFiters.tsx, deparmentDashboard.ts) sitting alongside
-// the correct ones, delete them — having both is what caused the
-// "Cannot find module" / stale-props confusion.
+// CHANGED: handleViewDetailedBreakdown now navigates to
+// /department-dashboard/parameters instead of just logging. The
+// currently-selected department is passed via React Router's
+// `navigate(path, { state })` — NOT a URL param — so the new page
+// opens already showing the right department without the URL ever
+// containing a department name (per that page's spec).
 // ============================================================
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Breadcrumb from '../components/Breadcrumb';
 import DepartmentFilters from '../components/DepartmentDashboard/DepartmentFilters';
@@ -28,6 +26,7 @@ import RecentActivity from '../components/FundingDashboard/RecentActivity';
 
 import { departmentDashboardData } from '../data/departmentDashboardData';
 import { ALL_DEPARTMENTS, type DepartmentKey } from '../types/departmentDashboard';
+import type { ParameterPerformanceItem } from '../types/fundingDashboard';
 
 import '../styles/FundingDashboard.css';
 
@@ -40,6 +39,8 @@ const MONTHS = [
 const DEFAULT_DEPARTMENT: DepartmentKey = 'Program';
 
 export default function DepartmentDashboard() {
+  const navigate = useNavigate();
+
   const [department, setDepartment] = useState<DepartmentKey>(DEFAULT_DEPARTMENT);
   const [year, setYear] = useState('2026');
   const [month, setMonth] = useState('June');
@@ -49,7 +50,7 @@ export default function DepartmentDashboard() {
 
   const parameterOptions = [
     'All Parameters',
-    ...data.parameterPerformance.map((item) => item.name),
+    ...data.parameterPerformance.map((item: ParameterPerformanceItem) => item.name),
   ];
 
   function handleDepartmentChange(next: DepartmentKey) {
@@ -66,7 +67,7 @@ export default function DepartmentDashboard() {
   }
 
   function handleViewDetailedBreakdown() {
-    console.log('View detailed parameter breakdown requested', department);
+    navigate('/department-dashboard/parameters', { state: { department } });
   }
 
   function handleViewAllActivity() {
@@ -84,9 +85,6 @@ export default function DepartmentDashboard() {
       />
 
       <div>
-        {/* Falls back to the generic template text unless a
-            department (like Monitoring and Evaluation) explicitly
-            overrides it via pageTitle/pageSubtitle. */}
         <h1 className="page-title">{data.pageTitle ?? `${department} Department Dashboard`}</h1>
         <p className="page-subtitle">
           {data.pageSubtitle ?? `Track and analyze performance for all ${department} department KPIs.`}
