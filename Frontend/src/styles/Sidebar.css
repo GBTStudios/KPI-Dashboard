@@ -81,6 +81,41 @@
   color: #14534E;
 }
 
+.sidebar-dropdown-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+/* .sidebar-dropdown-toggle.open {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+} */
+
+.sidebar-dropdown-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: transform 0.15s ease;
+}
+
+.sidebar-dropdown-toggle.open .sidebar-dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.sidebar-sublist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-sublink {
+  padding-left: 28px;
+  font-size: 11px;
+}
+
 .sidebar-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 10px;
