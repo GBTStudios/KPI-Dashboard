@@ -20,7 +20,7 @@ import "../styles/KpiEntry.css";
 import "../styles/KpiUpdate.css";
 
 const DEPARTMENTS = [
-  "Programs",
+  "PROGRAM",
   "Partnerships",
   "Marketing",
   "Funding",

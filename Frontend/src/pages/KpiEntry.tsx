@@ -8,7 +8,7 @@ import { ApiError } from "../services/api";
 import "../styles/KpiEntry.css";
 
 const DEPARTMENTS = [
-  "Programs",
+  "PROGRAM",
   "Partnerships",
   "Marketing",
   "Funding",
