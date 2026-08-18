@@ -1,16 +1,23 @@
 // Refactored from the old FundingFilters.tsx. Structurally almost
-// identical — same controlled-select pattern — the real change is
-// `department`/`onDepartmentChange` are now typed as DepartmentKey
-// instead of a free-form string, so this component can only ever
-// be given one of the 7 real department names, never a typo.
+// identical — same controlled-select pattern.
+//
+// CHANGED: department/onDepartmentChange are back to plain `string`
+// instead of DepartmentKey. DepartmentKey was a fixed 7-value compile-
+// time union matching the old hardcoded mock departments; departments
+// now come from the backend's `departments` table (see
+// DepartmentDashboard.tsx / departmentDashboardService.ts), so there is
+// no fixed set of values left to type-check against - the set of valid
+// names can only be known at runtime. The old "can only ever be given
+// one of the 7 real department names, never a typo" guarantee this
+// component used to have no longer applies for the same reason.
 
 import { Download } from 'lucide-react';
-import type { DepartmentFilterOptions, DepartmentKey } from '../../types/departmentDashboard';
+import type { DepartmentFilterOptions } from '../../types/departmentDashboard';
 
 interface DepartmentFiltersProps {
   options: DepartmentFilterOptions;
-  department: DepartmentKey;
-  onDepartmentChange: (value: DepartmentKey) => void;
+  department: string;
+  onDepartmentChange: (value: string) => void;
   year: string;
   onYearChange: (value: string) => void;
   month: string;
@@ -40,12 +47,9 @@ export default function DepartmentFilters({
           <select
             className="funding-filter-select"
             value={department}
-            // e.target.value is always `string` in the DOM, so it's
-            // cast to DepartmentKey here. This is safe (not a lie to
-            // the compiler) because every <option> below is rendered
-            // FROM options.departments, which is already typed as
-            // DepartmentKey[] — the value can never be anything else.
-            onChange={(e) => onDepartmentChange(e.target.value as DepartmentKey)}
+            // e.target.value is already `string` - no cast needed now
+            // that onDepartmentChange takes a plain string.
+            onChange={(e) => onDepartmentChange(e.target.value)}
           >
             {options.departments.map((dept) => (
               <option key={dept} value={dept}>
