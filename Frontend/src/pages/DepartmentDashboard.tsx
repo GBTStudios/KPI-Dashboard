@@ -16,9 +16,21 @@
 // `string` (not `DepartmentKey`) or this file won't type-check against
 // it. I didn't rewrite that component here since it wasn't asked for
 // this round - say the word and I'll do that pass too.
+//
+// CHANGED: handleViewDetailedBreakdown now navigates to
+// /department-dashboard/parameters instead of just logging. The
+// currently-selected department is passed via React Router's
+// `navigate(path, { state })` — NOT a URL param — so the new page
+// opens already showing the right department without the URL ever
+// containing a department name (per that page's spec). Passes
+// `departmentName` (the backend department's display name) in the
+// `department` state key, since the receiving page expects that same
+// key from before - only the VALUE's source changed, from a
+// DepartmentKey union member to this dynamic department's name.
 // ============================================================
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Breadcrumb from '../components/Breadcrumb';
 import DepartmentFilters from '../components/DepartmentDashboard/DepartmentFilters';
@@ -57,6 +69,8 @@ const MONTH_TO_ABBR: Record<string, string> = {
 };
 
 export default function DepartmentDashboard() {
+  const navigate = useNavigate();
+
   const [departments, setDepartments] = useState<DepartmentOption[]>([]);
   const [departmentId, setDepartmentId] = useState<string | null>(null);
   const [year, setYear] = useState('2026');
@@ -133,7 +147,7 @@ export default function DepartmentDashboard() {
   }
 
   function handleViewDetailedBreakdown() {
-    console.log('View detailed parameter breakdown requested', departmentId);
+    navigate('/department-dashboard/parameters', { state: { department: departmentName } });
   }
 
   function handleViewAllActivity() {

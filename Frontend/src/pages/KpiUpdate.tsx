@@ -12,7 +12,7 @@ import {
   PlusCircle,
   History,
 } from "lucide-react";
-import { MONTHS, getEndOfYearActual, getEndOfYearTarget } from "../types/kpi";
+import { MONTHS, getEndOfYearTarget } from "../types/kpi";
 import type { KpiIndicator } from "../types/kpi";
 import { listKpis, deleteKpi, saveIndicatorRow } from "../services/kpiService";
 import { ApiError } from "../services/api";
@@ -411,7 +411,6 @@ export default function KpiUpdate() {
               filtered.map((row) => {
               const isModified = modifiedIds.has(row.id);
               const isEditing = editingRowId === row.id;
-              const eoyActual = getEndOfYearActual(row.monthlyActual);
               const eoyTarget = getEndOfYearTarget(row.monthlyTarget);
 
               return (
