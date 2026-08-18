@@ -42,13 +42,21 @@ class CleanedRow:
     parameter: str
     indicator_name: str
     person_in_charge: str | None
-    annual_target: float
+    annual_target: float | None  # blank/unparseable is valid now - see _extract_first_number
     target_type: str
     measurement_unit: str
     year: int
     month: int  # 1-12
     actual_value: float | None
     target_value: float | None
+    # Trusted as-is from the source Percentage(%) row when present (wide
+    # format only - some indicators, e.g. Funding's 50%-weighted line,
+    # are calculated outside this system and must not be overwritten by
+    # an actual/target*100 recompute). None means "no source percentage
+    # available" - the long format never sets this, and downstream
+    # import code should fall back to computing it in that case, same
+    # as before.
+    percentage: float | None = None
 
 
 @dataclass
@@ -140,6 +148,32 @@ def _parse_month(value) -> int | None:
 _CURRENCY_CHARS_RE = re.compile(r"[€$£¥,\s]")
 
 
+# Annual Target sometimes carries a human annotation alongside the
+# number, e.g. Mentorship's "20(1.HY) \n20+14(2.HY)" - this pulls out
+# the FIRST number and discards everything else. It does not evaluate
+# "20+14" as an expression; that's a note for a human reader, not data
+# for this system to compute. Used only for Annual Target - Actual
+# Value/Target Value/month cells go through the stricter _parse_number
+# below, since those are expected to be clean numbers or blank, not
+# annotated text.
+_FIRST_NUMBER_RE = re.compile(r"-?\d{1,3}(?:,\d{3})*(?:\.\d+)?|-?\d+(?:\.\d+)?")
+
+
+def _extract_first_number(value) -> float | None:
+    if _is_blank(value):
+        return None
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return float(value)
+    text = str(value).strip()
+    match = _FIRST_NUMBER_RE.search(text.replace(",", ""))
+    if not match:
+        return None
+    try:
+        return float(match.group())
+    except ValueError:
+        return None
+
+
 def _parse_number(value) -> float | None:
     if _is_blank(value):
         return None
@@ -196,11 +230,15 @@ def clean_and_validate(df: pd.DataFrame) -> CleaningResult:
         target_type_raw = cell("Target Type")
         measurement_unit_raw = cell("Measurement Unit")
 
+        # Annual Target and Person Responsible are no longer mandatory -
+        # a blank cell imports as NULL rather than failing the row. See
+        # _extract_first_number's docstring for why Annual Target uses a
+        # looser parse than a strict float() here.
         missing_fields = [
             label
             for label, v in [
                 ("Department", department), ("Parameter", parameter),
-                ("Indicator", indicator_name), ("Annual Target", cell("Annual Target")),
+                ("Indicator", indicator_name),
                 ("Target Type", target_type_raw), ("Measurement Unit", measurement_unit_raw),
                 ("Year", cell("Year")), ("Month", cell("Month")),
             ]
@@ -213,13 +251,7 @@ def clean_and_validate(df: pd.DataFrame) -> CleaningResult:
             ))
             continue
 
-        annual_target = _parse_number(raw_row.get("Annual Target"))
-        if annual_target is None or annual_target <= 0:
-            result.errors.append(RowError(
-                row_number=row_number, column="Annual Target",
-                message="Annual Target must be a positive number.",
-            ))
-            continue
+        annual_target = _extract_first_number(raw_row.get("Annual Target"))
 
         target_type = target_type_raw.upper()
         if target_type not in _VALID_TARGET_TYPES:
@@ -293,16 +325,24 @@ def clean_and_validate(df: pd.DataFrame) -> CleaningResult:
 #     every row except the first row of their group)
 #   - Indicator names prefixed with "#"
 #   - Exactly one Actuals row followed by exactly one Target(...) row
-#     per indicator - the Percentage(%) row after that is always
-#     skipped, same rule as everywhere else: percentage is never
-#     trusted from the source, only ever computed here
-#   - Currency-formatted Annual Target/month values (reuses _parse_number)
-#   - Months with no data in either Actuals or Target are skipped, same
-#     as the long format not getting a row for an untouched month
+#     per indicator, optionally followed by a Percentage(%) row - when
+#     present, that row's value is trusted as-is (CleanedRow.percentage)
+#     rather than recomputed, since some indicators (e.g. Funding's
+#     50%-weighted line) have their percentage calculated outside this
+#     system before the sheet is filled in
+#   - Currency-formatted month values (Actual/Target use _parse_number).
+#     Annual Target uses the looser _extract_first_number instead, since
+#     it sometimes carries extra annotation text (e.g. Mentorship's
+#     "20(1.HY) \n20+14(2.HY)") - only the first number is kept, the
+#     text is discarded. A blank or unparseable Annual Target no longer
+#     rejects the indicator; it just imports as NULL.
+#   - Months with no data in Actuals, Target, AND Percentage are
+#     skipped, same as the long format not getting a row for an
+#     untouched month
 #
-# KNOWN LIMITATION: an indicator whose Actuals/Target rows are
-# completely empty across all 12 months produces zero CleanedRows, so
-# it won't be created at all (nothing to anchor a get-or-create call
+# KNOWN LIMITATION: an indicator whose Actuals/Target/Percentage rows
+# are completely empty across all 12 months produces zero CleanedRows,
+# so it won't be created at all (nothing to anchor a get-or-create call
 # to). Add those manually via KPI Entry instead.
 # ======================================================================
 
@@ -407,19 +447,13 @@ def clean_and_validate_wide(df: pd.DataFrame, year: int) -> CleaningResult:
             i += 1
             continue
 
-        annual_target = _parse_number(row.get(annual_target_col))
-        if annual_target is None or annual_target <= 0:
-            result.errors.append(RowError(
-                row_number=block_row_number, column="Annual Target",
-                message=f"Annual Target for '{indicator_name}' could not be parsed as a number: "
-                        f"{row.get(annual_target_col)!r}. This indicator was not imported.",
-            ))
-            # Skip past this block's Target/Percentage rows so they aren't
-            # mistaken for the start of a new block.
-            i += 1
-            while i < n and map_value(records[i]).startswith(("target", "percentage")):
-                i += 1
-            continue
+        # Annual Target may be blank, or may carry extra text alongside
+        # the number (e.g. Mentorship's "20(1.HY) \n20+14(2.HY)"). Only
+        # the first number is kept; the text is discarded, not evaluated.
+        # A blank/unparseable value no longer skips the indicator - it
+        # just means annual-progress percentage can't be computed for it
+        # downstream (same as any indicator with no Annual Target).
+        annual_target = _extract_first_number(row.get(annual_target_col))
 
         person_in_charge = None
         if person_col and not _is_blank(row.get(person_col)):
@@ -446,13 +480,21 @@ def clean_and_validate_wide(df: pd.DataFrame, year: int) -> CleaningResult:
 
         target_type = _infer_target_type(str(target_row.get(map_col) or ""))
 
+        # Trusted as-is when present - some indicators (e.g. Funding's
+        # 50%-weighted line) have their percentage calculated outside
+        # this system before the sheet is filled in, so a naive
+        # actual/target*100 recompute would silently produce a
+        # different, wrong number for those. See CleanedRow.percentage.
+        percentage_row: dict | None = None
         if j < n and map_value(records[j]).startswith("percentage"):
-            j += 1  # consume it - never imported, always recomputed
+            percentage_row = records[j]
+            j += 1
 
         for month_idx, col_name in month_columns.items():
             actual_value = _parse_number(actuals_row.get(col_name))
             target_value = _parse_number(target_row.get(col_name))
-            if actual_value is None and target_value is None:
+            percentage = _parse_number(percentage_row.get(col_name)) if percentage_row else None
+            if actual_value is None and target_value is None and percentage is None:
                 continue
 
             dup_key = (current_department.lower(), current_parameter.lower(), indicator_name.lower(), year, month_idx)
@@ -470,6 +512,7 @@ def clean_and_validate_wide(df: pd.DataFrame, year: int) -> CleaningResult:
                 indicator_name=indicator_name, person_in_charge=person_in_charge,
                 annual_target=annual_target, target_type=target_type, measurement_unit=measurement_unit,
                 year=year, month=month_idx, actual_value=actual_value, target_value=target_value,
+                percentage=percentage,
             ))
 
         i = j

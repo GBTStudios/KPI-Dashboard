@@ -25,6 +25,8 @@ all NULL - required so "no data yet" is visible instead of silently
 disappearing (see the module docstring in schemas/dashboard.py on why
 None != 0 throughout this module).
 """
+import uuid
+
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -80,3 +82,61 @@ class DashboardRepository:
         stmt = select(Department.name).distinct().order_by(Department.name)
         result = await self.db.execute(stmt)
         return [row[0] for row in result.all()]
+
+    # ---------------------------------------------------------------- #
+    # Department Dashboard - same shape as get_kpi_year_rows above, plus
+    # parameter name/id (needed for ParameterPerformance and the
+    # Parameter filter dropdown) and filtered by department_id rather
+    # than department name. Kept separate from get_kpi_year_rows rather
+    # than adding parameter to that one, since /dashboard/overview and
+    # its existing tests/callers don't need it and I don't want to widen
+    # a query out from under code that already works.
+    # ---------------------------------------------------------------- #
+
+    async def get_department_year_rows(self, department_id: uuid.UUID, year: int):
+        """Row columns: department, parameter, indicator_id, indicator,
+        annual_target, measurement_unit, month (1-12 or None),
+        actual_value, target_value, percentage. Same LEFT JOIN reasoning
+        as get_kpi_year_rows: an indicator with zero rows for `year`
+        still appears once with month/actual/target/percentage all None,
+        so "no data yet" is visible rather than silently omitted."""
+        stmt = (
+            select(
+                Department.name.label("department"),
+                Parameter.id.label("parameter_id"),
+                Parameter.name.label("parameter"),
+                KpiIndicator.id.label("indicator_id"),
+                KpiIndicator.indicator_name.label("indicator"),
+                KpiIndicator.annual_target.label("annual_target"),
+                KpiIndicator.measurement_unit.label("measurement_unit"),
+                KpiMonthlyValue.month.label("month"),
+                KpiMonthlyValue.actual_value.label("actual_value"),
+                KpiMonthlyValue.target_value.label("target_value"),
+                KpiMonthlyValue.percentage.label("percentage"),
+            )
+            .select_from(KpiIndicator)
+            .join(Parameter, KpiIndicator.parameter_id == Parameter.id)
+            .join(Department, Parameter.department_id == Department.id)
+            .outerjoin(
+                KpiMonthlyValue,
+                and_(
+                    KpiMonthlyValue.indicator_id == KpiIndicator.id,
+                    KpiMonthlyValue.year == year,
+                ),
+            )
+            .where(Department.id == department_id)
+        )
+        result = await self.db.execute(stmt)
+        return result.all()
+
+    async def get_department_by_id(self, department_id: uuid.UUID):
+        result = await self.db.execute(select(Department).where(Department.id == department_id))
+        return result.scalar_one_or_none()
+
+    async def list_departments_full(self) -> list[Department]:
+        """Returns id+name, not just names - backs GET /dashboard/departments
+        and the department_id the frontend needs to actually call the
+        per-department endpoint (get_distinct_departments above only
+        returns names, which isn't enough on its own)."""
+        result = await self.db.execute(select(Department).order_by(Department.name))
+        return list(result.scalars().all())

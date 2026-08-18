@@ -22,21 +22,40 @@ class KpiRepository:
     # ---------------------------------------------------------------- #
 
     async def get_or_create_department(self, name: str) -> Department:
-        result = await self.db.execute(select(Department).where(Department.name == name))
+        """Matches case-insensitively (collapsing incoming whitespace
+        first) so "PROGRAM ", "Programs", "programs" all resolve to the
+        same row instead of creating a new Department per casing variant
+        - this was previously an exact Department.name == name match,
+        which is why imports using different casing across files created
+        real duplicates in the DB. The FIRST display name ever inserted
+        for a given normalized name is what's kept; a later import using
+        different casing does not rename the existing row."""
+        normalized = " ".join(name.strip().split())
+        result = await self.db.execute(
+            select(Department).where(func.lower(Department.name) == normalized.lower())
+        )
         department = result.scalar_one_or_none()
         if department is None:
-            department = Department(name=name)
+            department = Department(name=normalized)
             self.db.add(department)
             await self.db.flush()
         return department
 
     async def get_or_create_parameter(self, department_id: uuid.UUID, name: str) -> Parameter:
+        """Same case-insensitive/whitespace-normalized matching as
+        get_or_create_department, and for the same reason - a Parameter
+        name re-typed with different casing across two imports should
+        resolve to the existing row, not create a sibling."""
+        normalized = " ".join(name.strip().split())
         result = await self.db.execute(
-            select(Parameter).where(Parameter.department_id == department_id, Parameter.name == name)
+            select(Parameter).where(
+                Parameter.department_id == department_id,
+                func.lower(Parameter.name) == normalized.lower(),
+            )
         )
         parameter = result.scalar_one_or_none()
         if parameter is None:
-            parameter = Parameter(department_id=department_id, name=name)
+            parameter = Parameter(department_id=department_id, name=normalized)
             self.db.add(parameter)
             await self.db.flush()
         return parameter

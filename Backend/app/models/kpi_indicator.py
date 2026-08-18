@@ -27,7 +27,14 @@ class KpiIndicator(Base):
     )
 
     indicator_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    annual_target: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
+    # Nullable: some real-world sheet rows have no clean numeric Annual
+    # Target (blank, or annotated text like Mentorship's
+    # "20(1.HY) \n20+14(2.HY)" where only a partial number could be
+    # extracted with confidence) - see kpi_import_validator's
+    # _extract_first_number. An indicator with no Annual Target is still
+    # valid; it just can't contribute to annual-progress percentage
+    # calculations downstream (those already guard on this being present).
+    annual_target: Mapped[Decimal | None] = mapped_column(Numeric(14, 2), nullable=True)
 
     # Stored as plain strings (not a native DB enum) for cross-db portability
     # and consistency with User.theme_preference - validity is enforced at

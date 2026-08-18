@@ -13,6 +13,7 @@ from app.services.admin_seed_service import seed_admin_user
 from app.api.v1.admin.users_routes import router as admin_users_router
 from app.api.v1.auth.routes import router as auth_router
 from app.api.v1.dashboard.routes import router as dashboard_router
+from app.api.v1.dashboard.department_routes import router as department_dashboard_router
 from app.api.v1.health.routes import router as health_router
 from app.api.v1.users.routes import router as users_router
 from app.api.v1.users.settings_routes import router as settings_router
@@ -81,3 +82,4 @@ app.include_router(settings_router, prefix=settings.API_V1_PREFIX)
 app.include_router(kpis_router, prefix=settings.API_V1_PREFIX)
 app.include_router(imports_router, prefix=settings.API_V1_PREFIX)
 app.include_router(dashboard_router, prefix=settings.API_V1_PREFIX)
+app.include_router(department_dashboard_router, prefix=settings.API_V1_PREFIX)

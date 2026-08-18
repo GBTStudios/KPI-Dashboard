@@ -246,7 +246,7 @@ class KpiService:
             department=department.name,
             parameter=parameter.name,
             indicator_name=indicator.indicator_name,
-            annual_target=float(indicator.annual_target),
+            annual_target=float(indicator.annual_target) if indicator.annual_target is not None else None,
             target_type=indicator.target_type,
             measurement_unit=indicator.measurement_unit,
             person_in_charge=indicator.person_in_charge,

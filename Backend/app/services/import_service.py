@@ -173,10 +173,20 @@ class ImportService:
         return ImportResultOut(history=self._to_history_out(history), row_errors=row_errors)
 
     async def _import_row(self, row) -> None:
-        department = self._department_cache.get(row.department)
+        # NOTE: this cache key is normalized (trim + casefold) so that
+        # within ONE import, "PROGRAM " and "Programs" rows resolve to
+        # the same cached Department object instead of two separate
+        # lookups. This does NOT fix duplicates already in the DB, or
+        # duplicates created across two separate import runs that used
+        # different casing - that requires kpi_repo.get_or_create_department
+        # itself to match case-insensitively (it currently isn't in front
+        # of me to confirm/fix - if it does an exact-string lookup, two
+        # imports with different casing will still create two rows).
+        department_key = " ".join(row.department.strip().split()).casefold()
+        department = self._department_cache.get(department_key)
         if department is None:
-            department = await self.kpi_repo.get_or_create_department(row.department)
-            self._department_cache[row.department] = department
+            department = await self.kpi_repo.get_or_create_department(row.department.strip())
+            self._department_cache[department_key] = department
 
         parameter_key = (row.department, row.parameter)
         parameter = self._parameter_cache.get(parameter_key)
@@ -190,7 +200,14 @@ class ImportService:
             indicator, _created = await self.kpi_repo.get_or_create_indicator(
                 parameter_id=parameter.id,
                 indicator_name=row.indicator_name,
-                annual_target=Decimal(str(row.annual_target)),
+                # row.annual_target can legitimately be None now (blank
+                # cell, or text the validator couldn't confidently parse
+                # a number out of) - see kpi_import_validator's
+                # _extract_first_number. Previously this always ran
+                # Decimal(str(row.annual_target)), which raised
+                # decimal.InvalidOperation on Decimal(str(None)) and
+                # would have failed every such row.
+                annual_target=Decimal(str(row.annual_target)) if row.annual_target is not None else None,
                 target_type=row.target_type,
                 measurement_unit=row.measurement_unit,
                 person_in_charge=row.person_in_charge,
@@ -231,7 +248,25 @@ class ImportService:
             if target is not None:
                 monthly_value.target_value = target
 
-        monthly_value.percentage = self._calculate_percentage(monthly_value.actual_value, monthly_value.target_value)
+        # Percentage: trusted from the source file when the wide-format
+        # parser captured one (row.percentage is not None) - some
+        # indicators (e.g. Funding's "Grants - 50%" line) have their
+        # percentage calculated outside this system before the sheet is
+        # filled in, and actual/target*100 would silently produce a
+        # different, wrong number for those. The long format never sets
+        # row.percentage (it has no source percentage column), so this
+        # falls through to the original recompute for every long-format
+        # row, unchanged from before.
+        #
+        # Unit note: row.percentage comes from a cell Excel formats as
+        # "0%", so pandas/openpyxl hand back the underlying fraction
+        # (0.559, not 55.9) - multiply by 100 here to match the 0-100
+        # scale _calculate_percentage and the rest of the app use for
+        # KpiMonthlyValue.percentage.
+        if row.percentage is not None:
+            monthly_value.percentage = round(Decimal(str(row.percentage)) * 100, 2)
+        else:
+            monthly_value.percentage = self._calculate_percentage(monthly_value.actual_value, monthly_value.target_value)
         # No flush here. The old per-row flush() was the biggest cost in
         # a large import: with this backend's per-request latency (see
         # the chat note on expected-columns taking 1.5s with zero DB

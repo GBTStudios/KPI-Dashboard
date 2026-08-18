@@ -65,7 +65,7 @@ class KpiOut(BaseModel):
     department: str
     parameter: str
     indicator_name: str
-    annual_target: float
+    annual_target: float | None
     target_type: TargetType
     measurement_unit: MeasurementUnit
     person_in_charge: str | None
