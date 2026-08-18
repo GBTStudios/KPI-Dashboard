@@ -135,7 +135,6 @@ export default function KpiEntry() {
   }
 
   async function handleAddIndicator() {
-    // Clear previous errors
     setError(null);
 
     // Validate all fields
