@@ -19,3 +19,5 @@ pytest==8.3.3
 pytest-asyncio==0.24.0
 greenlet==3.1.1
 sendgrid==6.11.0
+pandas
+openpyxl

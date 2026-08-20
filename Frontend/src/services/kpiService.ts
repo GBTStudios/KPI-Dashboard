@@ -7,7 +7,7 @@ import type { KpiIndicator } from "../types/kpi";
  * Read this before wiring anything else in.
  * ---------------------------------------------------------------------
  *
- * 1. YEAR IS NOW A REAL BACKEND DIMENSION.
+ * 1. YEAR IS A REAL BACKEND DIMENSION.
  *    KpiMonthlyValue is (indicator_id, year, month) with a uniqueness
  *    constraint on that triple. Every read/write route on /kpis takes an
  *    optional `year` query param (defaults to the current calendar year
@@ -18,7 +18,16 @@ import type { KpiIndicator } from "../types/kpi";
  *    or switching years in the dropdown will silently keep showing/
  *    saving to whatever year the server picks.
  *
- * 2. NO DRAFT/SUBMITTED STATE ON THE BACKEND.
+ * 2. NO AUTO-FILLED TARGETS. A month's target is null until the user
+ *    (or an imported spreadsheet) actually provides one - never
+ *    computed as annual_target / 12. That used to happen here AND on
+ *    the backend, and it silently fabricated nonsense targets for any
+ *    non-MONTHLY indicator (a biannual 5,000 lump sum showing up as a
+ *    ~417 "target" on every month that was never meant to have one).
+ *    toKpiIndicator() below passes target_value straight through as
+ *    null/number - it does not invent a default for display either.
+ *
+ * 3. NO DRAFT/SUBMITTED STATE ON THE BACKEND.
  *    KpiOut has no status field. "Save draft" and "Submit"/"Finalize
  *    submission" are two buttons that do the exact same thing against
  *    this API: persist whatever's currently edited. I wired both to the
@@ -60,21 +69,21 @@ interface BackendKpiListResponse {
 /**
  * Backend -> frontend shape. A freshly-created indicator has an EMPTY
  * monthly_values array (rows are only created lazily, the first time a
- * month is actually edited) — so for any month with no row yet, we fill
- * in the same default the backend itself uses when you first touch that
- * month (annual_target / 12), purely for display. Nothing is persisted
- * until the user actually edits and saves.
+ * month is actually edited) — so for any month with no row yet, target
+ * and actual both stay null. Nothing is persisted until the user
+ * actually edits and saves, and nothing is guessed for display either -
+ * see the top-of-file note on why a computed default used to live here
+ * and why that was wrong.
  */
 export function toKpiIndicator(kpi: BackendKpiOut): KpiIndicator {
   const byMonth = new Map(kpi.monthly_values.map((mv) => [mv.month, mv]));
-  const defaultTarget = Math.round(kpi.annual_target / 12);
 
-  const monthlyTarget: number[] = [];
+  const monthlyTarget: (number | null)[] = [];
   const monthlyActual: (number | null)[] = [];
 
   for (const month of MONTHS) {
     const existing = byMonth.get(month);
-    monthlyTarget.push(existing?.target_value ?? defaultTarget);
+    monthlyTarget.push(existing?.target_value ?? null);
     monthlyActual.push(existing?.actual_value ?? null);
   }
 
@@ -149,7 +158,7 @@ export async function updateAnnualTarget(id: string, annualTarget: number, year?
 export async function updateMonth(
   id: string,
   month: (typeof MONTHS)[number],
-  values: { actualValue: number | null; targetValue: number },
+  values: { actualValue: number | null; targetValue: number | null },
   year?: number
 ): Promise<BackendKpiOut> {
   const qs = year ? `?year=${year}` : "";

@@ -65,7 +65,7 @@ class KpiOut(BaseModel):
     department: str
     parameter: str
     indicator_name: str
-    annual_target: float
+    annual_target: float | None
     target_type: TargetType
     measurement_unit: MeasurementUnit
     person_in_charge: str | None
@@ -101,9 +101,11 @@ class UpdateKpiRequest(BaseModel):
 
 class UpdateMonthRequest(BaseModel):
     """Backs a single grid-cell edit in KpiEntry.tsx / KpiUpdate.tsx.
-    `target_value` is optional - if omitted on a month that has no row yet,
-    the service defaults it to annual_target / 12 (see KpiService); if the
-    month already has a row and target_value is omitted, the existing
-    target_value is left unchanged."""
+    Both actual_value and target_value are entered by the user with no
+    computed default - if target_value is omitted on a month that has no
+    row yet, it's simply stored as None (shows as blank, not a guessed
+    number) until the user actually types one in. If the month already
+    has a row and target_value is omitted, the existing value is left
+    unchanged."""
     actual_value: float | None = None
     target_value: float | None = None

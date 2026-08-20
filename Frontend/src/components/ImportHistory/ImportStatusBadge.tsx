@@ -7,11 +7,11 @@
 // duplicating the icon/color logic.
 //
 // Accessibility note: status is communicated by TEXT ("Completed"
-// / "Failed"), not just color — so it still reads correctly for
-// colorblind users or anyone using a screen reader.
+// / "Partial" / "Failed"), not just color — so it still reads
+// correctly for colorblind users or anyone using a screen reader.
 // ============================================================
 
-import { CircleCheck, CircleAlert } from 'lucide-react';
+import { CircleCheck, CircleAlert, AlertTriangle } from 'lucide-react';
 import type { ImportStatus } from '../../types/importHistory';
 
 interface ImportStatusBadgeProps {
@@ -24,6 +24,15 @@ export default function ImportStatusBadge({ status }: ImportStatusBadgeProps) {
       <span className="import-status-badge import-status-completed">
         <CircleCheck size={13} />
         Completed
+      </span>
+    );
+  }
+
+  if (status === 'partial') {
+    return (
+      <span className="import-status-badge import-status-partial">
+        <AlertTriangle size={13} />
+        Partial
       </span>
     );
   }

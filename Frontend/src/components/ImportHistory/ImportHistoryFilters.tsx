@@ -51,6 +51,7 @@ export default function ImportHistoryFilters({
         >
           <option value="all">All Statuses</option>
           <option value="completed">Completed</option>
+          <option value="partial">Partial</option>
           <option value="failed">Failed</option>
         </select>
         <ChevronDown size={14} className="import-history-status-chevron" />

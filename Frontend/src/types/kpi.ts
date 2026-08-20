@@ -6,7 +6,7 @@ export interface KpiIndicator {
   personInCharge: string;
   annualTarget: number;
   year: number; // reporting year this row's monthly data belongs to - see kpiService.ts
-  monthlyTarget: number[]; // 12 values, Jan–Dec
+  monthlyTarget: (number | null)[]; // 12 values, Jan–Dec - null until the user enters one, no computed default
   monthlyActual: (number | null)[]; // 12 values, Jan–Dec
 }
 
@@ -29,6 +29,6 @@ export function getEndOfYearActual(monthlyActual: (number | null)[]): number {
   return monthlyActual.reduce((sum: number, val) => sum + (val ?? 0), 0);
 }
 
-export function getEndOfYearTarget(monthlyTarget: number[]): number {
+export function getEndOfYearTarget(monthlyTarget: (number | null)[]): number {
   return monthlyTarget.reduce((sum: number, val) => sum + (val ?? 0), 0);
 }

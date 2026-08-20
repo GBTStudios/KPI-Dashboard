@@ -225,3 +225,36 @@ class KpiIndicatorNotFoundException(AppException):
 
     def __init__(self):
         super().__init__("KPI indicator not found.")
+
+
+class InvalidImportFileTypeException(AppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    error_code = "INVALID_IMPORT_FILE_TYPE"
+
+    def __init__(self):
+        super().__init__("Only .xlsx and .csv files are accepted.")
+
+
+class ImportFileTooLargeException(AppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    error_code = "IMPORT_FILE_TOO_LARGE"
+
+    def __init__(self, max_mb: int):
+        super().__init__(f"File exceeds the {max_mb}MB size limit.")
+
+
+class ImportColumnsMissingException(AppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    error_code = "IMPORT_COLUMNS_MISSING"
+
+    def __init__(self, missing_columns: list[str]):
+        self.missing_columns = missing_columns
+        super().__init__(f"Missing required column(s): {', '.join(missing_columns)}.")
+
+
+class ImportHistoryNotFoundException(AppException):
+    status_code = status.HTTP_404_NOT_FOUND
+    error_code = "IMPORT_HISTORY_NOT_FOUND"
+
+    def __init__(self):
+        super().__init__("Import history record not found.")
