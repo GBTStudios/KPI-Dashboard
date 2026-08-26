@@ -73,8 +73,8 @@ export default function ParameterPerformancePage() {
     <div className="funding-dashboard-page">
       <Breadcrumb
         items={[
-          { label: 'Dashboard', to: '/dashboard' },
-          { label: 'Departments' },
+          { label: "Dashboard", to: "/dashboard" },
+          { label: "Departments" },
           { label: department },
         ]}
       />
@@ -82,19 +82,22 @@ export default function ParameterPerformancePage() {
       <div>
         <h1 className="page-title">Detailed Parameter Performance</h1>
         <p className="page-subtitle">
-          Granular analysis of individual {department.toLowerCase()} channels and responsible leads.
+          Granular analysis of individual {department.toLowerCase()} channels
+          and responsible leads.
         </p>
       </div>
 
       <DepartmentFilters
         options={{
-          departments: ALL_DEPARTMENTS,
+          departments: [...ALL_DEPARTMENTS],
           years: YEARS,
           months: MONTHS,
           parameters: parameterOptions,
         }}
         department={department}
-        onDepartmentChange={setDepartment}
+        onDepartmentChange={(value) => {
+          if (isDepartmentKey(value)) setDepartment(value);
+        }}
         year={year}
         onYearChange={setYear}
         month={month}
