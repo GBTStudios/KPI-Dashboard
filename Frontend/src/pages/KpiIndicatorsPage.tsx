@@ -1,30 +1,30 @@
 // ============================================================
-// DepartmentDashboard.tsx
+// KpiIndicatorsPage.tsx
 // ------------------------------------------------------------
-// CHANGED (this pass): handleViewAllKpis now navigates to
-// /department-dashboard/kpis instead of just logging — same
-// pattern as handleViewDetailedBreakdown just below it. Passes
-// `departmentName` via navigation state, same key/value the
-// Parameter Performance page already expects.
+// CHANGED: no longer imports the hardcoded departmentDashboardData
+// mock or ALL_DEPARTMENTS/DepartmentKey. Departments and dashboard
+// data now come from services/departmentDashboardService.ts — the
+// SAME service DepartmentDashboard.tsx uses, since kpiOverviewRows,
+// heatmapRows, and summaryCards (needed for the Data Integrity
+// card) are all already part of the DepartmentDashboardData that
+// service returns. No new service file needed.
 //
-// Everything else below is unchanged from the version your
-// teammate wrote for the backend integration.
+// The incoming department NAME still arrives via location.state
+// (set by DepartmentDashboard.tsx's handleViewAllKpis — see the
+// note at the bottom of this file about that). Since the backend
+// keys departments by id, not name, the department list is fetched
+// first and then matched by name — mirroring exactly how
+// DepartmentDashboard.tsx's handleDepartmentChange resolves a name
+// back to an id.
 // ============================================================
 
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import Breadcrumb from '../components/Breadcrumb';
 import DepartmentFilters from '../components/DepartmentDashboard/DepartmentFilters';
-import FundingSummaryCards from '../components/FundingDashboard/FundingSummaryCards';
-import MonthlyPerformanceChart from '../components/FundingDashboard/MonthlyPerformanceChart';
-import ParameterPerformance from '../components/FundingDashboard/ParameterPerformance';
-import KpiPerformanceTable from '../components/FundingDashboard/KpiPerformanceTable';
-import PerformanceHeatmap from '../components/FundingDashboard/PerformanceHeatmap';
-import AnnualTargetProgress from '../components/FundingDashboard/AnnualTargetProgress';
-import MonthlyComparison from '../components/FundingDashboard/MonthlyComparison';
-import KpiAlerts from '../components/FundingDashboard/KpiAlerts';
-import RecentActivity from '../components/FundingDashboard/RecentActivity';
+import KpiIndicatorsTable from '../components/KpiIndicatorsPage/KpiIndicatorsTable';
+import KpiIndicatorsSummary from '../components/KpiIndicatorsPage/KpiIndicatorsSummary';
 
 import {
   listDepartments,
@@ -34,6 +34,7 @@ import {
 } from '../services/departmentDashboardService';
 
 import '../styles/FundingDashboard.css';
+import '../styles/KpiIndicatorsPage.css';
 
 const YEARS = ['2024', '2025', '2026'];
 const MONTHS = [
@@ -41,14 +42,21 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
+// Same full-name -> 3-letter conversion as DepartmentDashboard.tsx —
+// the backend takes "Jun", the dropdown shows "June".
 const MONTH_TO_ABBR: Record<string, string> = {
   January: 'Jan', February: 'Feb', March: 'Mar', April: 'Apr',
   May: 'May', June: 'Jun', July: 'Jul', August: 'Aug',
   September: 'Sep', October: 'Oct', November: 'Nov', December: 'Dec',
 };
 
-export default function DepartmentDashboard() {
-  const navigate = useNavigate();
+export default function KpiIndicatorsPage() {
+  const location = useLocation();
+  // location.state is `unknown` by design — narrowed carefully rather
+  // than trusted, since direct navigation to this URL means no state
+  // was ever set at all.
+  const incomingDepartmentName =
+    (location.state as { department?: unknown } | null)?.department;
 
   const [departments, setDepartments] = useState<DepartmentOption[]>([]);
   const [departmentId, setDepartmentId] = useState<string | null>(null);
@@ -60,15 +68,27 @@ export default function DepartmentDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // Departments list — fetched once. Picks the department matching
+  // whatever name arrived via navigation state; falls back to the
+  // first department returned if that name isn't found (covers both
+  // "opened this page directly" and "the passed name is stale").
   useEffect(() => {
     listDepartments()
       .then((depts) => {
         setDepartments(depts);
-        setDepartmentId((current) => current ?? depts[0]?.id ?? null);
+        const matched =
+          typeof incomingDepartmentName === 'string'
+            ? depts.find((d) => d.name === incomingDepartmentName)
+            : undefined;
+        setDepartmentId((current) => current ?? matched?.id ?? depts[0]?.id ?? null);
       })
       .catch(() => setLoadError('Could not load departments.'));
+    // Deliberately runs once on mount only — see DepartmentDashboard.tsx
+    // for the same pattern and reasoning.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Dashboard data — refetched whenever any filter changes.
   useEffect(() => {
     if (!departmentId) return;
     let cancelled = false;
@@ -85,7 +105,7 @@ export default function DepartmentDashboard() {
         if (!cancelled) setData(result);
       })
       .catch(() => {
-        if (!cancelled) setLoadError("Could not load this department's dashboard.");
+        if (!cancelled) setLoadError("Could not load this department's KPIs.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -116,23 +136,10 @@ export default function DepartmentDashboard() {
     console.log('Export requested', { departmentId, year, month, parameter });
   }
 
-  // CHANGED — was a console.log placeholder.
-  function handleViewAllKpis() {
-    navigate('/department-dashboard/kpis', { state: { department: departmentName } });
-  }
-
-  function handleViewDetailedBreakdown() {
-    navigate('/department-dashboard/parameters', { state: { department: departmentName } });
-  }
-
-  function handleViewAllActivity() {
-    console.log('View all activity requested', departmentId);
-  }
-
   if (isLoading && !data) {
     return (
       <div className="funding-dashboard-page">
-        <p>Loading department dashboard...</p>
+        <p>Loading KPIs...</p>
       </div>
     );
   }
@@ -140,7 +147,9 @@ export default function DepartmentDashboard() {
   if (loadError && !data) {
     return (
       <div className="funding-dashboard-page">
-        <p role="alert" style={{ color: '#b91c1c' }}>{loadError}</p>
+        <p role="alert" className="kpi-load-error">
+          {loadError}
+        </p>
       </div>
     );
   }
@@ -160,9 +169,9 @@ export default function DepartmentDashboard() {
       />
 
       <div>
-        <h1 className="page-title">{data.pageTitle ?? `${departmentName} Department Dashboard`}</h1>
+        <h1 className="page-title">All {departmentName} KPIs</h1>
         <p className="page-subtitle">
-          {data.pageSubtitle ?? `Track and analyze performance for all ${departmentName} department KPIs.`}
+          Comprehensive list of performance indicators for the {departmentName} department.
         </p>
       </div>
 
@@ -185,33 +194,38 @@ export default function DepartmentDashboard() {
       />
 
       {loadError && (
-        <p role="alert" style={{ color: '#b91c1c' }}>
+        <p role="alert" className="kpi-load-error">
           {loadError} (showing the last successfully loaded data)
         </p>
       )}
 
-      <FundingSummaryCards cards={data.summaryCards} />
+      <KpiIndicatorsTable
+        department={departmentName}
+        rows={data.kpiOverviewRows}
+        heatmapRows={data.heatmapRows}
+      />
 
-      <div className="funding-charts-row">
-        <MonthlyPerformanceChart data={data.monthlyTrend} />
-        <ParameterPerformance
-          items={data.parameterPerformance}
-          onViewDetails={handleViewDetailedBreakdown}
-          subtitle="Performance by parameter"
-        />
-      </div>
-
-      <div className="funding-mid-row">
-        <KpiPerformanceTable rows={data.kpiOverviewRows} onViewAll={handleViewAllKpis} />
-        <PerformanceHeatmap rows={data.heatmapRows} />
-      </div>
-
-      <div className="funding-bottom-row">
-        <AnnualTargetProgress data={data.annualTargetProgress} />
-        <MonthlyComparison items={data.monthlyComparison} />
-        <KpiAlerts alerts={data.kpiAlerts} />
-        <RecentActivity items={data.recentActivity} onViewAll={handleViewAllActivity} />
-      </div>
+      <KpiIndicatorsSummary summaryCards={data.summaryCards} />
     </div>
   );
 }
+
+// --------------------------------------------------------------
+// REQUIRED FOLLOW-UP for DepartmentDashboard.tsx
+// ------------------------------------------------------------
+// The pasted version of DepartmentDashboard.tsx still has:
+//
+//   function handleViewAllKpis() {
+//     console.log('View all KPIs requested', departmentId);
+//   }
+//
+// This needs the same navigation treatment as
+// handleViewDetailedBreakdown got:
+//
+//   function handleViewAllKpis() {
+//     navigate('/department-dashboard/kpis', { state: { department: departmentName } });
+//   }
+//
+// (departmentName, not departmentId — this page matches by name,
+// same as the Parameter Performance page does.)
+// --------------------------------------------------------------
