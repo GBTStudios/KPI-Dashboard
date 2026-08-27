@@ -1,19 +1,17 @@
-import { Search, Bell } from "lucide-react";
+import { Search } from "lucide-react";
 import "../styles/Header.css";
 
 interface HeaderProps {
   searchPlaceholder?: string;
   onSearch?: (value: string) => void;
-  hasNotifications?: boolean;
   userAvatar?: string;
   userName?: string;
   onAvatarClick?: () => void;
 }
 
 export default function Header({
-  searchPlaceholder = "Search KPIs, reports...",
+  searchPlaceholder = "Search KPIs, parameters...",
   onSearch,
-  hasNotifications = false,
   userAvatar,
   userName = "User",
   onAvatarClick,
@@ -30,11 +28,6 @@ export default function Header({
       </div>
 
       <div className="header-actions">
-        <button type="button" className="header-notification" aria-label="Notifications">
-          <Bell size={18} />
-          {hasNotifications && <span className="notification-dot" />}
-        </button>
-
         <button
           type="button"
           className="header-avatar-button"
