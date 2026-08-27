@@ -120,3 +120,74 @@
 .app-btn-danger:hover {
   background: #B91C1C;
 }
+
+.success-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 280px;
+  padding: 12px 16px;
+
+  background: #ffffff;
+  border: 1px solid #E1F0EE;
+  border-radius: 10px;
+
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+
+  font-family: 'Poppins', sans-serif;
+
+  animation: toastSlideIn 0.25s ease-out;
+}
+
+.success-toast-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #14534E;
+  color: #fff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  flex-shrink: 0;
+}
+
+.success-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.success-toast-content strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.success-toast-content span {
+  font-size: 10.5px;
+  color: #64748B;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

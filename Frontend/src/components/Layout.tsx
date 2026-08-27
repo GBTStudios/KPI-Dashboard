@@ -22,6 +22,7 @@ export default function Layout() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const [showToast, setShowToast] = useState(false);
 
   // Load current user (theme + avatar + name/email) on mount
   useEffect(() => {
@@ -31,9 +32,12 @@ export default function Layout() {
         setCurrentUser(data);
 
         const theme = data.theme_preference || "light";
-        const themeToApply = theme === "system"
-          ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-          : theme;
+        const themeToApply =
+          theme === "system"
+            ? window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light"
+            : theme;
         document.documentElement.setAttribute("data-theme", themeToApply);
         localStorage.setItem("theme", themeToApply);
       } catch {
@@ -57,8 +61,13 @@ export default function Layout() {
     try {
       // 1. Update profile name if changed
       if (data.fullName) {
-        await api.patch<{ full_name: string }>("/users/me/profile", { full_name: data.fullName });
-        setCurrentUser((prev) => (prev ? { ...prev, full_name: data.fullName } : prev));
+        await api.patch<{ full_name: string }>("/users/me/profile", {
+          full_name: data.fullName,
+        });
+
+        setCurrentUser((prev) =>
+          prev ? { ...prev, full_name: data.fullName } : prev,
+        );
       }
 
       // 2. Upload avatar if provided
@@ -67,13 +76,17 @@ export default function Layout() {
         formData.append("file", data.avatarFile);
 
         const token = localStorage.getItem("authToken");
-        const response = await fetch("http://localhost:8000/api/v1/users/me/avatar", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
+
+        const response = await fetch(
+          "http://localhost:8000/api/v1/users/me/avatar",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
           },
-          body: formData,
-        });
+        );
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -81,22 +94,35 @@ export default function Layout() {
         }
 
         const { avatar_url } = await response.json();
+
         setCurrentUser((prev) => (prev ? { ...prev, avatar_url } : prev));
       }
 
-      alert("Profile updated successfully!");
+      // Show success toast
+      setShowToast(true);
+
+      // Automatically hide toast after 3 seconds
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+
+      setShowProfileModal(false);
     } catch (error) {
       console.error("Failed to update profile:", error);
-      alert(`Failed to update profile: ${error instanceof Error ? error.message : "Please try again."}`);
+
+      throw new Error(
+        error instanceof Error ? error.message : "Please try again.",
+      );
     }
-    setShowProfileModal(false);
   }
 
   return (
     <div className="app-layout">
       <Sidebar
         onSignOut={() => setShowLogoutModal(true)}
-        userName={currentUser?.full_name}
+        onAvatarClick={() => setShowProfileModal(true)}
+        userName={currentUser?.full_name ?? "User"}
+        userAvatar={currentUser?.avatar_url ?? undefined}
       />
       <div className="app-main">
         <Header
@@ -126,10 +152,21 @@ export default function Layout() {
         <ProfileModal
           currentName={currentUser?.full_name ?? ""}
           currentEmail={currentUser?.email ?? ""}
+          currentAvatarUrl={currentUser?.avatar_url ?? undefined}
           onCancel={() => setShowProfileModal(false)}
           onSave={handleSaveProfile}
         />
       )}
+
+      {showToast && (
+  <div className="success-toast" role="status">
+    <div className="success-toast-icon">✓</div>
+    <div>
+      <strong>Profile updated</strong>
+      <span>Your profile has been updated successfully.</span>
+    </div>
+  </div>
+)}
     </div>
   );
 }
