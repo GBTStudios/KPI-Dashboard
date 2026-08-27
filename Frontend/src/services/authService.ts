@@ -89,9 +89,44 @@ async function apiRequest<T>(path: string, body: unknown): Promise<T> {
 // ---- Token storage ----
 // Keys match what Login.tsx already uses for email/password login, so
 // Google sign-in results in the exact same "logged in" state app-wide.
+// Also the keys src/services/api.ts reads from directly (getAccessToken()
+// there) and now reads/writes via refreshAccessToken() below too.
 export function storeAuthTokens(tokens: TokenPair) {
   localStorage.setItem("authToken", tokens.access_token);
   localStorage.setItem("refreshToken", tokens.refresh_token);
+}
+
+// NEW: read the refresh token that storeAuthTokens() above persisted.
+// api.ts never touches localStorage directly for this - it goes through
+// refreshAccessToken() below, keeping all refresh-token handling in one
+// place instead of duplicating storage-key knowledge into api.ts too.
+export function getRefreshToken(): string | null {
+  return localStorage.getItem("refreshToken");
+}
+
+// NEW: full session teardown. Used by api.ts when a refresh attempt fails
+// (i.e. the refresh token itself is expired/revoked/reused) so the user is
+// dropped back to a clean logged-out state rather than looping on 401s.
+export function clearAuthTokens() {
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("refreshToken");
+}
+
+// NEW: calls the existing POST /api/v1/auth/refresh endpoint (already
+// implemented server-side in AuthService.refresh - rotation + reuse
+// detection included) and returns the new token pair. Reuses apiRequest()
+// exactly like every other call in this file - no duplicate fetch logic.
+//
+// Throws (via apiRequest's existing error handling) if the refresh token
+// is missing, expired, or has been revoked - e.g. after reuse detection
+// revokes an entire session family. Callers (api.ts) are responsible for
+// clearing tokens and redirecting to login when this rejects.
+export async function refreshAccessToken(): Promise<TokenPair> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) {
+    throw new Error("No refresh token available.");
+  }
+  return apiRequest<TokenPair>("/refresh", { refresh_token: refreshToken });
 }
 
 // ---- Sign up ----
@@ -217,4 +252,20 @@ interface VerifyEmailPayload {
 
 export async function verifyEmail({ token }: VerifyEmailPayload) {
   return apiRequest<UserOut>("/verify-email", { token });
+}
+
+// ---- Logout ----
+// NEW: calls the existing POST /api/v1/auth/logout (revokes the refresh
+// token server-side) and always clears local tokens afterward, even if the
+// network call fails - a logged-out UI should never depend on the backend
+// being reachable.
+export async function logout() {
+  const refreshToken = getRefreshToken();
+  try {
+    if (refreshToken) {
+      await apiRequest<null>("/logout", { refresh_token: refreshToken });
+    }
+  } finally {
+    clearAuthTokens();
+  }
 }
