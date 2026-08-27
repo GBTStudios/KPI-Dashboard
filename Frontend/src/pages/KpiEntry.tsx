@@ -161,7 +161,7 @@ export default function KpiEntry() {
         personInCharge: newRow.personInCharge,
         year: Number(year),
       });
-      setIndicators((prev) => [...prev, created]);
+      setIndicators((prev) => [created, ...prev]);
       setNewRow((prev) => ({ ...prev, indicator: "", annualTarget: "" }));
       setError(null);
     } catch (err) {
