@@ -95,9 +95,7 @@ export default function ParameterPerformancePage() {
           parameters: parameterOptions,
         }}
         department={department}
-        onDepartmentChange={(value) => {
-          if (isDepartmentKey(value)) setDepartment(value);
-        }}
+        onDepartmentChange={(value) => setDepartment(value as DepartmentKey)}
         year={year}
         onYearChange={setYear}
         month={month}

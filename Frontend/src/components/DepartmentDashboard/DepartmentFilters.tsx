@@ -1,15 +1,15 @@
-// Refactored from the old FundingFilters.tsx. Structurally almost
-// identical — same controlled-select pattern.
-//
-// CHANGED: department/onDepartmentChange are back to plain `string`
-// instead of DepartmentKey. DepartmentKey was a fixed 7-value compile-
-// time union matching the old hardcoded mock departments; departments
-// now come from the backend's `departments` table (see
-// DepartmentDashboard.tsx / departmentDashboardService.ts), so there is
-// no fixed set of values left to type-check against - the set of valid
-// names can only be known at runtime. The old "can only ever be given
-// one of the 7 real department names, never a typo" guarantee this
-// component used to have no longer applies for the same reason.
+// ============================================================
+// DepartmentFilters.tsx
+// ------------------------------------------------------------
+// CHANGED: `department`/`onDepartmentChange` are now plain `string`
+// instead of `DepartmentKey`. Departments used to be a fixed
+// 7-value compile-time union; now they come from the backend's
+// `departments` table (see services/departmentDashboardService.ts)
+// and can be any string that table returns. The type-safety this
+// component used to provide (only a real department name compiles)
+// has moved to runtime instead — the caller is responsible for only
+// passing values that actually came from a fetched departments list.
+// ============================================================
 
 import { Download } from 'lucide-react';
 import type { DepartmentFilterOptions } from '../../types/departmentDashboard';
@@ -47,8 +47,6 @@ export default function DepartmentFilters({
           <select
             className="funding-filter-select"
             value={department}
-            // e.target.value is already `string` - no cast needed now
-            // that onDepartmentChange takes a plain string.
             onChange={(e) => onDepartmentChange(e.target.value)}
           >
             {options.departments.map((dept) => (

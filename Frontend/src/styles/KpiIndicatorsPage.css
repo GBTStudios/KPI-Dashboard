@@ -1,0 +1,286 @@
+/* ==============================================================
+   KPIINDICATORSPAGE.CSS
+   ------------------------------------------------------------
+   Redefines the shared :root variables (same values as
+   FundingDashboard.css / ImportData.css / ImportHistory.css) so
+   this page is self-contained, following the same per-page
+   convention already established in this project.
+   ============================================================== */
+
+:root {
+  --color-primary: #1c5e59;
+  --color-blue: #5575f2;
+  --color-bg-page: #f4f5f7;
+  --color-card-bg: #ffffff;
+  --color-border: #e5e7eb;
+  --color-text-main: #1a1a1a;
+  --color-text-muted: #6b7280;
+  --color-success: #1c5e59;
+  --color-success-bg: #e5f3f1;
+  --color-danger: #b3435a;
+  --color-danger-bg: #fbe9ec;
+  --color-warning: #b8791f;
+  --color-warning-bg: #fdf1d8;
+  --radius-card: 12px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* --------------------------------------------------------------
+   Main table card
+   -------------------------------------------------------------- */
+.kpi-indicators-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+}
+
+.kpi-indicators-table-scroll {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.kpi-indicators-table {
+  width: 100%;
+  min-width: 900px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.kpi-indicators-table th {
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  background: #fafafa;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.kpi-indicators-table td {
+  padding: 14px 10px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.kpi-indicators-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.kpi-name-cell {
+  font-weight: 600;
+}
+
+.kpi-mono-cell {
+  font-family: 'Courier New', monospace;
+}
+
+.kpi-achievement-cell {
+  font-weight: 700;
+}
+
+.kpi-responsible-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+}
+
+.kpi-responsible-cell.unassigned {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.kpi-responsible-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-bg-page);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.kpi-indicators-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/* Monthly progress mini strip (real heatmap data, not fabricated) */
+.mini-strip {
+  display: flex;
+  gap: 2px;
+}
+
+.mini-strip-cell {
+  width: 7px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.mini-strip-on-target {
+  background: #cdeedc;
+}
+.mini-strip-at-risk {
+  background: #fbe6a8;
+}
+.mini-strip-below-target {
+  background: #f6c7d0;
+}
+
+.mini-strip-empty {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Actions cell (trend icon + row menu) */
+.kpi-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trend-up {
+  color: var(--color-success);
+}
+.trend-down {
+  color: var(--color-danger);
+}
+
+.kpi-row-menu-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.kpi-row-menu-btn:hover {
+  background: var(--color-bg-page);
+  color: var(--color-primary);
+}
+
+/* Footer: results label + pagination */
+.kpi-indicators-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 16px;
+  margin-top: 4px;
+  border-top: 1px solid var(--color-border);
+}
+
+.kpi-indicators-results-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* The reused ImportHistoryPagination component renders a "Page X of Y"
+   summary alongside its buttons — hidden here so the layout matches
+   this page's own "Showing X-Y of Z results" text on the left instead
+   of showing both. The pagination BUTTONS themselves are untouched. */
+.kpi-indicators-footer .pagination-summary {
+  display: none;
+}
+
+/* --------------------------------------------------------------
+   Bottom summary cards
+   -------------------------------------------------------------- */
+.kpi-indicators-summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 16px;
+}
+
+@media (max-width: 700px) {
+  .kpi-indicators-summary-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi-indicators-summary-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 18px 20px;
+}
+
+.kpi-indicators-summary-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+.kpi-owner-unavailable {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.kpi-integrity-value {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.kpi-integrity-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.kpi-integrity-track {
+  flex: 1;
+  height: 8px;
+  background: var(--color-bg-page);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.kpi-integrity-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+}
+
+.kpi-view-logs-btn {
+  border: 1px solid var(--color-border);
+  background: var(--color-card-bg);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-text-main);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.kpi-view-logs-btn:hover {
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.kpi-integrity-support {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+}
