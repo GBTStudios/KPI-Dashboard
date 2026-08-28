@@ -5,13 +5,13 @@
 .um-heading h1 {
   font-size: 22px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 
 .um-heading p {
   font-size: 13px;
-  color: #64748B;
+  color: var(--text-secondary);
   margin-bottom: 22px;
 }
 
@@ -23,8 +23,8 @@
 }
 
 .um-stat-card {
-  background: #fff;
-  border: 1px solid #E2E8F0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 18px 20px;
   display: flex;
@@ -37,7 +37,7 @@
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: #94A3B8;
+  color: var(--text-secondary);
   text-transform: uppercase;
   margin-bottom: 10px;
 }
@@ -46,7 +46,7 @@
   display: block;
   font-size: 26px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--text-primary);
 }
 
 .um-stat-icon {
@@ -60,17 +60,17 @@
 }
 
 .icon-purple {
-  background: #EDE9FE;
+  background: var(--purple-bg-subtle);
   color: #7C3AED;
 }
 
 .icon-green {
-  background: #D1FAE5;
+  background: var(--green-bg-subtle);
   color: #059669;
 }
 
 .icon-amber {
-  background: #FEF3C7;
+  background: var(--amber-bg-subtle);
   color: #D97706;
 }
 
@@ -86,14 +86,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
-  border: 1px solid #E2E8F0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 9px 14px;
 }
 
 .um-search-icon {
-  color: #94A3B8;
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
@@ -104,6 +104,7 @@
   font-size: 12.5px;
   font-family: 'Poppins', sans-serif;
   background: transparent;
+  color: var(--text-primary);
 }
 
 .um-clear-filters {
@@ -111,14 +112,14 @@
   border: none;
   font-size: 12.5px;
   font-weight: 500;
-  color: #64748B;
+  color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
 }
 
 .um-table-card {
-  background: #fff;
-  border: 1px solid #E2E8F0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -130,23 +131,23 @@
 }
 
 .um-table thead {
-  background: #F8F9FA;
+  background: var(--bg-secondary);
 }
 
 .um-table th {
   text-align: left;
   font-size: 11px;
   font-weight: 600;
-  color: #64748B;
+  color: var(--text-secondary);
   padding: 12px 20px;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .um-table td {
   padding: 14px 20px;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--border-color);
   font-size: 12.5px;
-  color: #0F172A;
+  color: var(--text-primary);
   vertical-align: middle;
 }
 
@@ -189,12 +190,12 @@
 .um-user-name {
   font-weight: 600;
   font-size: 12.5px;
-  color: #0F172A;
+  color: var(--text-primary);
 }
 
 .um-user-email {
   font-size: 11px;
-  color: #94A3B8;
+  color: var(--text-secondary);
   margin-top: 1px;
 }
 
@@ -214,14 +215,14 @@
 }
 
 .um-last-activity {
-  color: #64748B;
+  color: var(--text-secondary);
 }
 
 .um-row-menu {
   background: none;
   border: none;
   cursor: pointer;
-  color: #94A3B8;
+  color: var(--text-secondary);
   padding: 4px;
   display: inline-flex;
   align-items: center;
@@ -229,7 +230,7 @@
 
 .um-empty {
   text-align: center;
-  color: #94A3B8;
+  color: var(--text-secondary);
   padding: 24px !important;
 }
 
@@ -238,16 +239,16 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-top: 1px solid #E2E8F0;
+  border-top: 1px solid var(--border-color);
 }
 
 .um-pagination-summary {
   font-size: 12px;
-  color: #64748B;
+  color: var(--text-secondary);
 }
 
 .um-pagination-summary strong {
-  color: #0F172A;
+  color: var(--text-primary);
 }
 
 .um-pagination-controls {
@@ -260,11 +261,11 @@
   min-width: 30px;
   height: 30px;
   border-radius: 6px;
-  border: 1px solid #E2E8F0;
-  background: #fff;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
   font-size: 12px;
   font-weight: 500;
-  color: #64748B;
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
@@ -289,10 +290,10 @@
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  background: #fff;
-  border: 1px solid #E2E8F0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 8px 24px var(--shadow-color);
   padding: 6px;
   display: flex;
   flex-direction: column;
@@ -310,14 +311,14 @@
   border-radius: 7px;
   font-size: 12.5px;
   font-weight: 500;
-  color: #334155;
+  color: var(--text-secondary);
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
   text-align: left;
 }
 
 .um-dropdown-item:hover {
-  background: #F8F9FA;
+  background: var(--bg-secondary);
 }
 
 .um-dropdown-danger {
@@ -325,7 +326,7 @@
 }
 
 .um-dropdown-danger:hover {
-  background: #FEF2F2;
+  background: var(--danger-bg-subtle);
 }
 
 /* Confirmation modal */
@@ -342,12 +343,12 @@
 
 .um-modal {
   position: relative;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 16px;
   padding: 28px;
   width: 100%;
   max-width: 380px;
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 20px 48px var(--shadow-color);
 }
 
 .um-modal-close {
@@ -356,14 +357,14 @@
   right: 16px;
   background: none;
   border: none;
-  color: #94A3B8;
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
 }
 
 .um-modal-close:hover {
-  color: #334155;
+  color: var(--text-primary);
 }
 
 .um-modal-icon {
@@ -377,31 +378,31 @@
 }
 
 .um-modal-icon-amber {
-  background: #FEF3C7;
+  background: var(--amber-bg-subtle);
   color: #D97706;
 }
 
 .um-modal-icon-green {
-  background: #D1FAE5;
+  background: var(--green-bg-subtle);
   color: #059669;
 }
 
 .um-modal-icon-red {
-  background: #FEE2E2;
+  background: var(--danger-bg-subtle);
   color: #DC2626;
 }
 
 .um-modal-title {
   font-size: 16px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--text-primary);
   font-family: 'Poppins', sans-serif;
   margin-bottom: 6px;
 }
 
 .um-modal-description {
   font-size: 12.5px;
-  color: #64748B;
+  color: var(--text-secondary);
   font-family: 'Poppins', sans-serif;
   line-height: 1.5;
   margin-bottom: 22px;
@@ -427,13 +428,13 @@
 }
 
 .um-btn-secondary {
-  background: #fff;
-  border: 1px solid #E2E8F0;
-  color: #334155;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 .um-btn-secondary:hover {
-  background: #F8F9FA;
+  background: var(--bg-secondary);
 }
 
 .um-btn-amber {

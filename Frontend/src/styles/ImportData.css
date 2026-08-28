@@ -4,11 +4,11 @@
   --color-purple: #df92eb;
   --color-bg-tint: #daefee;
 
-  --color-bg-page: #f4f5f7;
-  --color-card-bg: #ffffff;
-  --color-border: #e5e7eb;
-  --color-text-main: #1a1a1a;
-  --color-text-muted: #6b7280;
+  --color-bg-page: var(--bg-secondary);
+  --color-card-bg: var(--bg-card);
+  --color-border: var(--border-color);
+  --color-text-main: var(--text-primary);
+  --color-text-muted: var(--text-secondary);
 
   --color-success: #1c5e59;
   --color-success-bg: #e5f3f1;
@@ -17,7 +17,13 @@
 
   --radius-card: 12px;
   --radius-pill: 999px;
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
+}
+
+[data-theme="dark"] {
+  --color-bg-tint: #1e3a37;
+  --color-success-bg: #163832;
+  --color-danger-bg: #3d1f1f;
 }
 
 /* --------------------------------------------------------------
@@ -162,14 +168,14 @@
 
 .upload-area.drag-active {
   border-color: var(--color-blue);
-  background: #f5f7ff;
+  background: var(--bg-secondary);
 }
 
 .upload-icon-circle {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: #eef1fe;
+  background: var(--color-bg-tint);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -11,12 +11,12 @@
 
 .app-modal {
   position: relative;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 16px;
   padding: 28px;
   width: 100%;
   max-width: 380px;
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 20px 48px var(--shadow-color);
   font-family: 'Poppins', sans-serif;
 }
 
@@ -26,14 +26,14 @@
   right: 16px;
   background: none;
   border: none;
-  color: #94A3B8;
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
 }
 
 .app-modal-close:hover {
-  color: #334155;
+  color: var(--text-primary);
 }
 
 .app-modal-icon {
@@ -47,25 +47,25 @@
 }
 
 .app-modal-icon-teal {
-  background: #E1F0EE;
+  background: var(--teal-bg-subtle);
   color: #14534E;
 }
 
 .app-modal-icon-red {
-  background: #FEE2E2;
+  background: var(--danger-bg-subtle);
   color: #DC2626;
 }
 
 .app-modal-title {
   font-size: 16px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--text-primary);
   margin-bottom: 6px;
 }
 
 .app-modal-description {
   font-size: 12.5px;
-  color: #64748B;
+  color: var(--text-secondary);
   line-height: 1.5;
   margin-bottom: 22px;
 }
@@ -89,13 +89,13 @@
 }
 
 .app-btn-secondary {
-  background: #fff;
-  border: 1px solid #E2E8F0;
-  color: #334155;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 .app-btn-secondary:hover {
-  background: #F8F9FA;
+  background: var(--bg-secondary);
 }
 
 .app-btn-primary {
@@ -134,11 +134,11 @@
   min-width: 280px;
   padding: 12px 16px;
 
-  background: #ffffff;
-  border: 1px solid #E1F0EE;
+  background: var(--bg-card);
+  border: 1px solid var(--teal-bg-subtle);
   border-radius: 10px;
 
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 8px 24px var(--shadow-color);
 
   font-family: 'Poppins', sans-serif;
 
@@ -172,12 +172,12 @@
 .success-toast-content strong {
   font-size: 12px;
   font-weight: 600;
-  color: #0F172A;
+  color: var(--text-primary);
 }
 
 .success-toast-content span {
   font-size: 10.5px;
-  color: #64748B;
+  color: var(--text-secondary);
 }
 
 @keyframes toastSlideIn {
