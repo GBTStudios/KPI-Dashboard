@@ -2,7 +2,7 @@
   width: 196px;
   min-width: 196px;
   height: calc(100vh - 24px);
-  background: #14534E;
+  background: var(--brand-primary);
   display: flex;
   flex-direction: column;
   padding: 14px 10px;
@@ -10,7 +10,7 @@
   top: 12px;
   margin: 12px 0 12px 12px;
   border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(20, 83, 78, 0.18);
+   background: var(--brand-primary);
 }
 
 .sidebar-brand {
