@@ -5,11 +5,11 @@
   --color-gold: #e0a83e;
   --color-bg-tint: #daefee;
 
-  --color-bg-page: #f4f5f7;
-  --color-card-bg: #ffffff;
-  --color-border: #e5e7eb;
-  --color-text-main: #1a1a1a;
-  --color-text-muted: #6b7280;
+  --color-bg-page: var(--bg-secondary);
+  --color-card-bg: var(--bg-card);
+  --color-border: var(--border-color);
+  --color-text-main: var(--text-primary);
+  --color-text-muted: var(--text-secondary);
 
   --color-success: #1c5e59;
   --color-success-bg: #e5f3f1;
@@ -22,7 +22,15 @@
 
   --radius-card: 12px;
   --radius-pill: 999px;
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
+}
+
+[data-theme="dark"] {
+  --color-bg-tint: #1e3a37;
+  --color-success-bg: #163832;
+  --color-info-bg: #1e2547;
+  --color-danger-bg: #3d1f1f;
+  --color-warning-bg: #3d2f14;
 }
 
 .funding-dashboard-page {
@@ -44,7 +52,7 @@
   font-size: 10px;
   line-height: 1.4;
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .breadcrumb-segment {
@@ -53,22 +61,22 @@
 }
 
 .breadcrumb-link {
-  color: #6b7280;
+  color: var(--color-text-muted);
   text-decoration: none;
   font-weight: 400;
 }
 
 .breadcrumb-link:hover {
-  color: #1c5e59;
+  color: var(--color-primary);
 }
 
 .breadcrumb-current {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 400;
 }
 
 .breadcrumb-separator {
-  color: #9ca3af;
+  color: var(--color-text-muted);
   margin: 0 5px;
   font-weight: 400;
 }
@@ -557,16 +565,16 @@
 }
 
 .heatmap-on-target {
-  background: #cdeedc;
-  color: #cdeedc;
+  background: var(--color-success-bg);
+  color: var(--color-success);
 }
 .heatmap-at-risk {
-  background: #fbe6a8;
-  color: #8a6110;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 .heatmap-below-target {
-  background: #f6c7d0;
-  color: #9c2f45;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
 }
 
 .heatmap-legend {
@@ -589,13 +597,13 @@
   border-radius: 3px;
 }
 .heatmap-legend-swatch.heatmap-on-target {
-  background: #cdeedc;
+  background: var(--color-success-bg)
 }
 .heatmap-legend-swatch.heatmap-at-risk {
-  background: #fbe6a8;
+  background: var(--color-success-bg)
 }
 .heatmap-legend-swatch.heatmap-below-target {
-  background: #f6c7d0;
+  background: var(--color-success-bg)
 }
 
 /* --------------------------------------------------------------

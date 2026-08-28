@@ -20,6 +20,14 @@
   --danger: #DC2626;
   --success: #16A34A;
   --warning: #D97706;
+
+  --purple-bg-subtle: #EDE9FE;
+  --green-bg-subtle: #D1FAE5;
+  --amber-bg-subtle: #FEF3C7;
+
+  --row-modified-bg: #FFFBEB;
+  --danger-bg-subtle: #FEF2F2;
+  --teal-bg-subtle: #E1F0EE;
 }
 
 [data-theme="dark"] {
@@ -34,6 +42,14 @@
   --shadow-color: rgba(0, 0, 0, 0.35);
 
   --brand-shadow: rgba(0, 0, 0, 0.3);
+
+  --row-modified-bg: #3d3418;
+  --danger-bg-subtle: #3d1f1f;
+  --teal-bg-subtle: #1a3a36;
+
+  --purple-bg-subtle: #2e2350;
+  --green-bg-subtle: #0f3d2e;
+  --amber-bg-subtle: #3d2f0a;
 }
 
 * {

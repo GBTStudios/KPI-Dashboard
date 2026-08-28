@@ -25,14 +25,14 @@
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #F8F9FA;
+  border: 2px solid var(--bg-secondary);
 }
 
 .profile-avatar-fallback {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: #E1F0EE;
+  background: var(--teal-bg-subtle);
   color: #14534E;
   display: flex;
   align-items: center;
@@ -48,7 +48,7 @@
   border-radius: 50%;
   background: #4F46E5;
   color: #fff;
-  border: 2px solid #fff;
+  border: 2px solid var(--bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,13 +63,13 @@
   display: block;
   font-size: 12.5px;
   font-weight: 600;
-  color: #0F172A;
+  color: var(--text-primary);
 }
 
 .profile-avatar-hint-sub {
   display: block;
   font-size: 10.5px;
-  color: #94A3B8;
+  color: var(--text-secondary);
   margin-top: 2px;
 }
 
@@ -81,19 +81,20 @@
   display: block;
   font-size: 10.5px;
   font-weight: 500;
-  color: #0F172A;
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 
 .profile-input {
   width: 100%;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--border-color);
   border-radius: 7px;
   padding: 8px 10px;
   font-size: 12.5px;
   font-family: 'Poppins', sans-serif;
   outline: none;
-  color: #0F172A;
+  color: var(--text-primary);
+  background: var(--bg-card);
 }
 
 .profile-input:focus {
@@ -101,8 +102,8 @@
 }
 
 .profile-input-disabled {
-  background: #F8F9FA;
-  color: #94A3B8;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   cursor: not-allowed;
 }
 

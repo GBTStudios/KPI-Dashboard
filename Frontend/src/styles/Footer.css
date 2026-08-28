@@ -1,6 +1,6 @@
 .app-footer {
   padding: 12px 24px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 14px;
   box-shadow: 0 4px 16px var(--shadow-color);
   text-align: center;

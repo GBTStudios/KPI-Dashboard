@@ -10,7 +10,7 @@
   top: 12px;
   margin: 12px 0 12px 12px;
   border-radius: 14px;
-   background: var(--brand-primary);
+  box-shadow: 0 8px 24px var(--brand-shadow);
 }
 
 .sidebar-brand {
@@ -156,7 +156,7 @@
 }
 
 .sidebar-avatar-button:hover .sidebar-avatar {
-  outline: 2px solid #E1F0EE;
+  outline: 2px solid var(--teal-bg-subtle);
 }
 
 .sidebar-profile-text {
@@ -200,4 +200,8 @@
 .sidebar-signout:hover {
   background: rgba(255, 255, 255, 0.06);
   color: #fff;
+}
+
+[data-theme="dark"] {
+  --brand-primary: #0F3B37;
 }
