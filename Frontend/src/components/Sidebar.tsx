@@ -37,19 +37,23 @@ interface SidebarProps {
   onSignOut?: () => void;
   userName?: string;
   userRole?: string;
+  userAvatar?: string;
+  onAvatarClick?: () => void;
 }
 
 export default function Sidebar({
   onSignOut,
   userName = "Super Admin",
   userRole = "Administrator",
+  userAvatar,
+  onAvatarClick,
 }: SidebarProps) {
-  const initials = userName
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  // const initials = userName
+  //   .split(" ")
+  //   .map((w) => w[0])
+  //   .join("")
+  //   .slice(0, 2)
+  //   .toUpperCase();
 
   const location = useLocation();
 
@@ -133,12 +137,24 @@ export default function Sidebar({
 
       <div className="sidebar-footer">
         <div className="sidebar-profile">
-          <div className="sidebar-avatar">{initials}</div>
-          <div className="sidebar-profile-text">
-            <span className="sidebar-profile-name">{userName}</span>
-            <span className="sidebar-profile-role">{userRole}</span>
-          </div>
-        </div>
+  <button
+    type="button"
+    className="sidebar-avatar-button"
+    onClick={onAvatarClick}
+    aria-label="Open profile"
+  >
+    <img
+      src={userAvatar || "/default-avatar.png"}
+      alt={userName}
+      className="sidebar-avatar"
+    />
+  </button>
+
+  <div className="sidebar-profile-text">
+    <span className="sidebar-profile-name">{userName}</span>
+    <span className="sidebar-profile-role">{userRole}</span>
+  </div>
+</div>
 
         <button type="button" className="sidebar-signout" onClick={onSignOut}>
           <LogOut size={16} />

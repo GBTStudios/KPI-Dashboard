@@ -1,24 +1,39 @@
-/* Add these CSS variables at the top of index.css */
 :root {
-  /* Light theme (default) */
+  /* Backgrounds */
   --bg-primary: #FFFFFF;
   --bg-secondary: #F8F9FA;
   --bg-card: #FFFFFF;
+
+  /* Text */
   --text-primary: #0F172A;
   --text-secondary: #64748B;
+
+  /* Borders & shadows */
   --border-color: #E2E8F0;
-  --shadow-color: rgba(0, 0, 0, 0.05);
+  --shadow-color: rgba(15, 23, 42, 0.06);
+
+  /* Brand (constant across themes) */
+  --brand-primary: #14534E;
+  --brand-shadow: rgba(20, 83, 78, 0.18);
+
+  /* Status colors (constant across themes) */
+  --danger: #DC2626;
+  --success: #16A34A;
+  --warning: #D97706;
 }
 
-/* Dark theme */
 [data-theme="dark"] {
   --bg-primary: #0F172A;
   --bg-secondary: #1E293B;
   --bg-card: #1E293B;
+
   --text-primary: #F1F5F9;
   --text-secondary: #94A3B8;
+
   --border-color: #334155;
-  --shadow-color: rgba(0, 0, 0, 0.2);
+  --shadow-color: rgba(0, 0, 0, 0.35);
+
+  --brand-shadow: rgba(0, 0, 0, 0.3);
 }
 
 * {

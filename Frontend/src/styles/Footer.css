@@ -2,13 +2,13 @@
   padding: 12px 24px;
   background: #fff;
   border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 4px 16px var(--shadow-color);
   text-align: center;
   margin: 12px 12px 12px;
 }
 
 .app-footer p {
   font-size: 10.5px;
-  color: #94A3B8;
+  color: var(--text-secondary);
   font-family: 'Poppins', sans-serif;
 }
