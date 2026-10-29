@@ -5,7 +5,9 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import LogoutModal from "../components/LogoutModal";
 import ProfileModal from "../components/ProfileModal";
-import { api } from "../services/api";
+import { api, getAccessToken } from "../services/api";
+import { logout as logoutRequest } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 import "../styles/Layout.css";
 
 interface CurrentUser {
@@ -18,6 +20,7 @@ interface CurrentUser {
 
 export default function Layout() {
   const navigate = useNavigate();
+  const { clearAuthenticated } = useAuth();
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -48,10 +51,32 @@ export default function Layout() {
     loadUser();
   }, []);
 
-  function handleConfirmLogout() {
-    localStorage.removeItem("authToken");
+  // CHANGED: this used to be `localStorage.removeItem("authToken")` +
+  // `navigate("/login")` — it left refreshToken behind, never told the
+  // backend to revoke the session, and didn't use `replace`, so pressing
+  // Back afterwards could land back on /dashboard with a stale-but-present
+  // refresh token still in storage.
+  //
+  // Now: authService.logout() is the single source of truth for clearing
+  // session state (it revokes server-side, then clears BOTH tokens in a
+  // finally so local state is always cleared even if the network call
+  // fails). We await it, then flip the shared auth context so every
+  // ProtectedRoute re-renders immediately, then replace-navigate to
+  // /login so /dashboard isn't a Back target anymore. Even if it were,
+  // ProtectedRoute would still refuse to render it once isAuthenticated
+  // is false — this replace is just tidiness, not the security boundary.
+  async function handleConfirmLogout() {
     setShowLogoutModal(false);
-    navigate("/login");
+    try {
+      await logoutRequest();
+    } catch {
+      // logoutRequest() already clears local tokens in its own finally
+      // block regardless of whether the backend call succeeded — a failed
+      // revoke shouldn't trap the user in a "still looks logged in" state.
+    } finally {
+      clearAuthenticated();
+      navigate("/login", { replace: true });
+    }
   }
 
   async function handleSaveProfile(data: {
@@ -75,7 +100,10 @@ export default function Layout() {
         const formData = new FormData();
         formData.append("file", data.avatarFile);
 
-        const token = localStorage.getItem("authToken");
+        // CHANGED: was a raw localStorage.getItem("authToken") — reuses
+        // the same helper api.ts already exports instead of a second
+        // place that has to know the storage key.
+        const token = getAccessToken();
 
         const response = await fetch(
           "http://localhost:8000/api/v1/users/me/avatar",
@@ -159,14 +187,14 @@ export default function Layout() {
       )}
 
       {showToast && (
-  <div className="success-toast" role="status">
-    <div className="success-toast-icon">✓</div>
-    <div>
-      <strong>Profile updated</strong>
-      <span>Your profile has been updated successfully.</span>
-    </div>
-  </div>
-)}
+        <div className="success-toast" role="status">
+          <div className="success-toast-icon">✓</div>
+          <div>
+            <strong>Profile updated</strong>
+            <span>Your profile has been updated successfully.</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

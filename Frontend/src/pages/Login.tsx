@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { login, googleAuth, storeAuthTokens } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logo.png";
 import "../styles/Login.css";
 
@@ -28,6 +29,7 @@ function validateEmail(value: string) {
 
 export default function Login() {
   const navigate = useNavigate();
+  const { setAuthenticated } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,15 +41,8 @@ export default function Login() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  // CHANGED: was `googleInitialized` (a boolean ref for the old One Tap
-  // flow). Now holds the initialized OAuth2 code client itself, so the
-  // button's onClick can call `.requestCode()` on it directly.
   const googleClientRef = useRef<{ requestCode: () => void } | null>(null);
 
-  // Load Google Identity Services SDK once on mount, then initialize the
-  // OAuth2 popup code client with our client ID. prompt: "select_account"
-  // forces Google's account chooser every time - this is what the old
-  // `accounts.id` One Tap flow couldn't do.
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
@@ -74,13 +69,14 @@ export default function Login() {
     setGoogleLoading(true);
     setSubmitError("");
     try {
-      // "Continue with Google" on Login always uses remember_me: true -
-      // matches the expectation that a returning user via Google shouldn't
-      // need to re-auth constantly. Adjust if you'd rather this respect a
-      // separate UI toggle instead.
       const data = await googleAuth({ code: response.code, rememberMe: true });
       storeAuthTokens(data.tokens);
-      navigate("/dashboard");
+      // CHANGED: flip shared auth state so ProtectedRoute/GuestRoute see
+      // the new session immediately, not on some later unrelated render.
+      setAuthenticated();
+      // CHANGED: replace, not push — the login page shouldn't remain a
+      // Back target once a session exists (requirement #3).
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Google sign-in failed. Please try again.");
     } finally {
@@ -143,7 +139,8 @@ export default function Login() {
     try {
       const data = await login({ email, password, rememberMe });
       storeAuthTokens(data.tokens);
-      navigate("/dashboard");
+      setAuthenticated();
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Login failed. Please try again.");
     } finally {

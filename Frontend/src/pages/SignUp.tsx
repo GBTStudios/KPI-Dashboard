@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { signUp, googleAuth, storeAuthTokens } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logo.png";
 import "../styles/SignUp.css";
 
@@ -31,6 +32,7 @@ function validateEmail(value: string) {
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const { setAuthenticated } = useAuth();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -45,15 +47,8 @@ export default function SignUp() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  // CHANGED: was `googleInitialized` (a boolean ref for the old One Tap
-  // flow). Now holds the initialized OAuth2 code client itself, so the
-  // button's onClick can call `.requestCode()` on it directly.
   const googleClientRef = useRef<{ requestCode: () => void } | null>(null);
 
-  // Load Google Identity Services SDK once on mount, then initialize the
-  // OAuth2 popup code client with our client ID. prompt: "select_account"
-  // forces Google's account chooser every time - this is what the old
-  // `accounts.id` One Tap flow couldn't do.
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
@@ -82,7 +77,13 @@ export default function SignUp() {
     try {
       const data = await googleAuth({ code: response.code, rememberMe: false });
       storeAuthTokens(data.tokens);
-      navigate("/dashboard");
+      // CHANGED: Google sign-up creates a session immediately (unlike the
+      // email/password path below, which goes to /verify-email first and
+      // never stores tokens here) — flip shared auth state so
+      // ProtectedRoute/GuestRoute pick it up right away, and replace
+      // rather than push so /signup isn't a Back target afterwards.
+      setAuthenticated();
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Google sign-up failed. Please try again.");
     } finally {
@@ -141,8 +142,6 @@ export default function SignUp() {
     }
   }
 
-
-
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitError("");
@@ -161,6 +160,9 @@ export default function SignUp() {
 
     setLoading(true);
     try {
+      // No token/auth-context change here on purpose: signUp() sends the
+      // user to email verification, not a live session — there's nothing
+      // for ProtectedRoute/GuestRoute to react to yet.
       await signUp({ fullName, email, password, confirmPassword });
       navigate("/verify-email", { state: { email } });
     } catch (err) {
